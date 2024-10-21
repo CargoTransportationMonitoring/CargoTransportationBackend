@@ -21,16 +21,6 @@ CREATE TABLE user_roles
     UNIQUE (user_id, role_id)
 );
 
-CREATE TABLE cargo
-(
-    cargo_id    SERIAL PRIMARY KEY,
-    name        varchar(50),
-    description TEXT,
-    weight      NUMERIC,
-    status      VARCHAR(50),
-    created_at  TIMESTAMPTZ DEFAULT now()
-);
-
 CREATE TABLE vehicle
 (
     vehicle_id  SERIAL PRIMARY KEY,
@@ -39,6 +29,16 @@ CREATE TABLE vehicle
     name        VARCHAR(25)
 );
 
+CREATE TABLE cargo
+(
+    cargo_id    SERIAL PRIMARY KEY,
+    name        varchar(50),
+    description TEXT,
+    weight      NUMERIC,
+    status      VARCHAR(50),
+    created_at  TIMESTAMPTZ DEFAULT now(),
+    vehicle_id  INT REFERENCES vehicle (vehicle_id)
+);
 
 CREATE TABLE cargo_location
 (
