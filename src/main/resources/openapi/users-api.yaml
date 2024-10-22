@@ -1,0 +1,87 @@
+openapi: 3.1.0
+info:
+  title: My API
+  version: 1.0.0
+paths:
+  /api/v1/users:
+    get:
+      summary: Получить список пользователей
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUserResponse'
+  /api/v1/user/{userId}:
+    get:
+      summary: Получить пользователя по id
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор пользователя
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '404':
+          description: Пользователь не найден
+  /api/v1/user/register:
+    post:
+      summary: Зарегистрировать нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '400':
+          description: Ошибка валидации данных
+
+components:
+  schemas:
+    GetUserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        username:
+          type: string
+    RegisterUserRequest:
+      type: object
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 20
+          description: Имя пользователя должно быть от 3 до 20 символов
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          description: Пароль должен быть не менее 8 символов
+        email:
+          type: string
+          format: email
+          description: Должен быть валидный email
