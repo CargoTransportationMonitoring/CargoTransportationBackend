@@ -2,6 +2,10 @@ openapi: 3.1.0
 info:
   title: My API
   version: 1.0.0
+
+tags:
+  - name: User
+    description: Operations with users
 paths:
   /api/v1/users:
     get:
@@ -15,6 +19,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GetUserResponse'
+      tags:
+        - User
   /api/v1/user/{userId}:
     get:
       summary: Получить пользователя по id
@@ -35,6 +41,8 @@ paths:
                 $ref: '#/components/schemas/GetUserResponse'
         '404':
           description: Пользователь не найден
+      tags:
+        - User
   /api/v1/user/register:
     post:
       summary: Зарегистрировать нового пользователя
@@ -53,6 +61,8 @@ paths:
                 $ref: '#/components/schemas/GetUserResponse'
         '400':
           description: Ошибка валидации данных
+      tags:
+        - User
 
 components:
   schemas:

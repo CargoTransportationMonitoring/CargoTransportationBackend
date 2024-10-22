@@ -32,7 +32,8 @@ val jacksonDatabindNullable = "0.2.6"
 // openApi
 val openApiSpecDir = "$rootDir/src/main/resources/openapi"
 val openApiGeneratedApiDir = layout.buildDirectory.dir("generated").get().toString()
-val useJakartaEe = mapOf("useJakartaEe" to "true")
+val openApiAdditionalProperties = mapOf("useJakartaEe" to "true")
+val configOptionsUse = mapOf("useTags" to "true", "useSpringBoot3" to "true", "interfaceOnly" to "true", "dataLibrary" to "java8", "skipOperationExample" to "true")
 val apiPackagePrefix = "com.example.api"
 val modelPackagePrefix = "com.example.model"
 val openApiSrcDir = "generated/src/main/java"
@@ -75,7 +76,7 @@ tasks.withType<Test> {
 }
 
 fun registerOpenApiTask(taskName: String, descriptionParam: String, specFile: String,
-                        apiPackageParam: String, modelPackageParam: String, apiInterfaceName: String) {
+                        apiPackageParam: String, modelPackageParam: String) {
     tasks.register(taskName, org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
         description = descriptionParam
         group = "OpenAPI"
@@ -84,19 +85,18 @@ fun registerOpenApiTask(taskName: String, descriptionParam: String, specFile: St
         outputDir.set(openApiGeneratedApiDir)
         apiPackage.set(apiPackageParam)
         modelPackage.set(modelPackageParam)
-        generateModelDocumentation.set(false)
-        generateApiDocumentation.set(false)
         library.set("spring-boot")
-        additionalProperties.set(useJakartaEe + mapOf("apiInterfaceName" to apiInterfaceName))
+        additionalProperties.set(openApiAdditionalProperties)
+        configOptions.set(configOptionsUse)
+        globalProperties.set(mapOf("generateSupportingFiles" to "false", "skipOperationExample" to "true"))
     }
 }
 
 registerOpenApiTask("openApiUsersApi", "Генерация API для сущности пользователей (users)",
     "users-api.yaml", "$apiPackagePrefix.users",
-    "$modelPackagePrefix.users", "UsersApi")
+    "$modelPackagePrefix.users")
 registerOpenApiTask("openApiCargoApi", "Генерация API для сущности грузов (cargo)",
-    "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo",
-    "CargoApi")
+    "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo")
 
 sourceSets {
     main {

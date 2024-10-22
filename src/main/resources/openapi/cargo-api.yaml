@@ -2,6 +2,10 @@ openapi: 3.1.0
 info:
   title: Cargo Tracking API
   version: 1.0.0
+
+tags:
+  - name: Cargo
+    description: Cargo api
 paths:
   /api/v1/vehicles:
     get:
@@ -15,6 +19,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Vehicle'
+      tags:
+        - Cargo
     post:
       summary: Добавить новое транспортное средство
       requestBody:
@@ -26,6 +32,8 @@ paths:
       responses:
         '201':
           description: Транспортное средство успешно добавлено
+      tags:
+        - Cargo
   /api/v1/vehicles/{vehicleId}:
     get:
       summary: Получить информацию о транспортном средстве
@@ -46,6 +54,8 @@ paths:
                 $ref: '#/components/schemas/Vehicle'
         '404':
           description: Транспортное средство не найдено
+      tags:
+        - Cargo
   /api/v1/cargo:
     get:
       summary: Получить список грузов
@@ -58,6 +68,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Cargo'
+      tags:
+        - Cargo
     post:
       summary: Добавить новый груз
       requestBody:
@@ -69,6 +81,8 @@ paths:
       responses:
         '201':
           description: Груз успешно добавлен
+      tags:
+        - Cargo
   /api/v1/cargo/{cargoId}:
     get:
       summary: Получить информацию о грузе
@@ -88,6 +102,8 @@ paths:
                 $ref: '#/components/schemas/Cargo'
         '404':
           description: Груз не найден
+      tags:
+        - Cargo
   /api/v1/cargo-location/{cargoId}:
     get:
       summary: Получить местоположение груза
@@ -109,6 +125,8 @@ paths:
                   $ref: '#/components/schemas/CargoLocation'
         '404':
           description: Груз или местоположение не найдено
+      tags:
+        - Cargo
 
 components:
   schemas:
