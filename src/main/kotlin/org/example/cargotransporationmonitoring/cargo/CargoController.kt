@@ -2,13 +2,17 @@ package org.example.cargotransporationmonitoring.cargo
 
 import com.example.api.cargo.CargoApi
 import com.example.model.cargo.*
+import org.example.cargotransporationmonitoring.cargo.service.CargoService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class CargoController: CargoApi {
-    override fun apiV1CargoCargoIdGet(cargoId: Int?): ResponseEntity<Cargo> {
-        TODO("Not yet implemented")
+class CargoController (
+    private val cargoService: CargoService
+): CargoApi {
+    override fun apiV1CargoCargoIdGet(cargoId: Int): ResponseEntity<Cargo>? {
+        cargoService.getCargo(cargoId.toLong())
+        return ResponseEntity.ok(Cargo().cargoId(1))
     }
 
     override fun apiV1CargoGet(): ResponseEntity<MutableList<Cargo>> {

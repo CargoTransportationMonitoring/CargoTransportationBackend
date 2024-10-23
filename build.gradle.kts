@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.openapi.generator") version "7.9.0"
+//    id("org.jetbrains.kotlin.kapt") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
 }
 
@@ -28,6 +29,7 @@ val junit5Version = "2.0.20"
 val junitLauncherVersion = "1.11.0"
 val openApiStarterVersion = "2.6.0"
 val jacksonDatabindNullable = "0.2.6"
+val mapstructVersion = "1.5.5.Final"
 
 // openApi
 val openApiSpecDir = "$rootDir/src/main/resources/openapi"
@@ -38,8 +40,12 @@ val apiPackagePrefix = "com.example.api"
 val modelPackagePrefix = "com.example.model"
 val openApiSrcDir = "generated/src/main/java"
 
+// taskNames
+val openApiUsersApiTask = "openApiUsersApi"
+val openApiCargoApiTask = "openApiCargoApi"
+
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 //    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 //    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion")
@@ -50,6 +56,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.liquibase:liquibase-core:$liquibaseVersion")
+    implementation("org.mapstruct:mapstruct:$mapstructVersion")
+//    kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 //    runtimeOnly("org.postgresql:r2dbc-postgresql:$r2dbcVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -92,10 +100,10 @@ fun registerOpenApiTask(taskName: String, descriptionParam: String, specFile: St
     }
 }
 
-registerOpenApiTask("openApiUsersApi", "Генерация API для сущности пользователей (users)",
+registerOpenApiTask(openApiUsersApiTask, "Генерация API для сущности пользователей (users)",
     "users-api.yaml", "$apiPackagePrefix.users",
     "$modelPackagePrefix.users")
-registerOpenApiTask("openApiCargoApi", "Генерация API для сущности грузов (cargo)",
+registerOpenApiTask(openApiCargoApiTask, "Генерация API для сущности грузов (cargo)",
     "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo")
 
 sourceSets {
@@ -107,5 +115,8 @@ sourceSets {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    dependsOn(tasks.named("openApiUsersApi"), tasks.named("openApiCargoApi"))
+    dependsOn(tasks.named(openApiUsersApiTask), tasks.named(openApiCargoApiTask))
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
 }

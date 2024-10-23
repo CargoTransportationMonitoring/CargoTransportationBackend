@@ -15,7 +15,7 @@ CREATE TABLE roles
 
 CREATE TABLE user_roles
 (
-    id SERIAL PRIMARY KEY,
+    id      SERIAL PRIMARY KEY,
     user_id INT REFERENCES users (user_id),
     role_id INT REFERENCES roles (role_id),
     UNIQUE (user_id, role_id)
@@ -24,9 +24,17 @@ CREATE TABLE user_roles
 CREATE TABLE vehicle
 (
     vehicle_id  SERIAL PRIMARY KEY,
-    driver_id   INT REFERENCES users (user_id),
     description TEXT,
     name        VARCHAR(25)
+);
+
+CREATE TABLE driver_schedule
+(
+    id         SERIAL PRIMARY KEY,
+    vehicle_id BIGINT    NOT NULL REFERENCES vehicle (vehicle_id),
+    user_id    BIGINT    NOT NULL REFERENCES users (user_id),
+    start_date TIMESTAMP NOT NULL,
+    end_date   TIMESTAMP
 );
 
 CREATE TABLE cargo
