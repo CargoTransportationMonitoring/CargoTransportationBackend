@@ -30,5 +30,4 @@ class LocaleTest: AbstractTest() {
             .andExpect(status().isBadRequest)
             .andReturn().response.contentAsString
     }
-
 }

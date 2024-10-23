@@ -21,7 +21,7 @@ repositories {
     mavenCentral()
 }
 
-// versions
+// dependency versions
 val postgresVersion = "42.7.2"
 val r2dbcVersion = "1.0.5.RELEASE"
 val liquibaseVersion = "4.29.2"
@@ -47,6 +47,7 @@ val openApiCargoApiTask = "openApiCargoApi"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 //    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 //    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion")
