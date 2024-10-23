@@ -1,6 +1,7 @@
 package org.example.cargotransporationmonitoring.advice
 
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 class ControllerExceptionHandler : ResponseEntityExceptionHandler() {
+
     @ExceptionHandler(Exception::class)
     protected fun handleException(
         request: HttpServletRequest?,
@@ -27,6 +29,7 @@ class ControllerExceptionHandler : ResponseEntityExceptionHandler() {
         if (responseStatus != null) {
             status = responseStatus.value.value()
         }
+        logger.error(message)
 
         return ResponseEntity.status(status)
             .contentType(MediaType.APPLICATION_JSON)

@@ -30,6 +30,7 @@ val junitLauncherVersion = "1.11.0"
 val openApiStarterVersion = "2.6.0"
 val jacksonDatabindNullable = "0.2.6"
 val mapstructVersion = "1.5.5.Final"
+val testContainersVersion = "1.20.1"
 
 // openApi
 val openApiSpecDir = "$rootDir/src/main/resources/openapi"
@@ -60,11 +61,18 @@ dependencies {
 //    kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 //    runtimeOnly("org.postgresql:r2dbc-postgresql:$r2dbcVersion")
+
+    // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$junit5Version")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$junit5Version")
+    testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitLauncherVersion")
+
 }
 
 kotlin {

@@ -4,4 +4,5 @@ import org.mapstruct.Mapper
 
 //@Mapper
 interface CargoMapper {
+
 }
