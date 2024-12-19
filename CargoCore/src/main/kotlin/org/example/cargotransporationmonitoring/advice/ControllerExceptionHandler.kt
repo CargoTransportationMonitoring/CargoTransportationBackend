@@ -1,7 +1,6 @@
 package org.example.cargotransporationmonitoring.advice
 
 import jakarta.servlet.http.HttpServletRequest
-import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType

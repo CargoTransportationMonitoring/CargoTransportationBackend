@@ -33,7 +33,7 @@ val mapstructVersion = "1.5.5.Final"
 val testContainersVersion = "1.20.1"
 
 // openApi
-val openApiSpecDir = "$rootDir/src/main/resources/openapi"
+val openApiSpecDir = "$rootDir/CargoCore/src/main/resources/openapi"
 val openApiGeneratedApiDir = layout.buildDirectory.dir("generated").get().toString()
 val openApiAdditionalProperties = mapOf("useJakartaEe" to "true")
 val configOptionsUse = mapOf("useTags" to "true", "useSpringBoot3" to "true", "interfaceOnly" to "true", "dataLibrary" to "java8", "skipOperationExample" to "true")
