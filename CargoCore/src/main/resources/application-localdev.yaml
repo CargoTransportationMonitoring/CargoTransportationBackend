@@ -1,6 +1,6 @@
 spring:
   application:
-    name: CargoTransportationMonitoringApplication
+    name: CargoTransportationMonitoringCore
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres

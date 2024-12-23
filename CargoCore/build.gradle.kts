@@ -45,6 +45,8 @@ val openApiSrcDir = "generated/src/main/java"
 val openApiUsersApiTask = "openApiUsersApi"
 val openApiCargoApiTask = "openApiCargoApi"
 
+extra["springCloudVersion"] = "2023.0.4"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -59,6 +61,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.liquibase:liquibase-core:$liquibaseVersion")
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 //    kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 //    runtimeOnly("org.postgresql:r2dbc-postgresql:$r2dbcVersion")
@@ -74,6 +77,12 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitLauncherVersion")
 
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
 }
 
 kotlin {
