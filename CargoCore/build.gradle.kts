@@ -31,12 +31,19 @@ val openApiStarterVersion = "2.6.0"
 val jacksonDatabindNullable = "0.2.6"
 val mapstructVersion = "1.5.5.Final"
 val testContainersVersion = "1.20.1"
+val keyCloakAdminVersion = "25.0.6"
 
 // openApi
 val openApiSpecDir = "$rootDir/CargoCore/src/main/resources/openapi"
 val openApiGeneratedApiDir = layout.buildDirectory.dir("generated").get().toString()
 val openApiAdditionalProperties = mapOf("useJakartaEe" to "true")
-val configOptionsUse = mapOf("useTags" to "true", "useSpringBoot3" to "true", "interfaceOnly" to "true", "dataLibrary" to "java8", "skipOperationExample" to "true")
+val configOptionsUse = mapOf(
+    "useTags" to "true",
+    "useSpringBoot3" to "true",
+    "interfaceOnly" to "true",
+    "dataLibrary" to "java8",
+    "skipOperationExample" to "true"
+)
 val apiPackagePrefix = "com.example.api"
 val modelPackagePrefix = "com.example.model"
 val openApiSrcDir = "generated/src/main/java"
@@ -50,6 +57,7 @@ extra["springCloudVersion"] = "2023.0.4"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 //    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 //    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion")
@@ -62,6 +70,7 @@ dependencies {
     implementation("org.liquibase:liquibase-core:$liquibaseVersion")
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    implementation("org.keycloak:keycloak-admin-client:$keyCloakAdminVersion")
 //    kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 //    runtimeOnly("org.postgresql:r2dbc-postgresql:$r2dbcVersion")
@@ -82,6 +91,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        mavenBom("org.keycloak.bom:keycloak-adapter-bom:${keyCloakAdminVersion}")
     }
 }
 
@@ -101,8 +111,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-fun registerOpenApiTask(taskName: String, descriptionParam: String, specFile: String,
-                        apiPackageParam: String, modelPackageParam: String) {
+fun registerOpenApiTask(
+    taskName: String, descriptionParam: String, specFile: String,
+    apiPackageParam: String, modelPackageParam: String
+) {
     tasks.register(taskName, org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
         description = descriptionParam
         group = "OpenAPI"
@@ -118,11 +130,15 @@ fun registerOpenApiTask(taskName: String, descriptionParam: String, specFile: St
     }
 }
 
-registerOpenApiTask(openApiUsersApiTask, "Генерация API для сущности пользователей (users)",
+registerOpenApiTask(
+    openApiUsersApiTask, "Генерация API для сущности пользователей (users)",
     "users-api.yaml", "$apiPackagePrefix.users",
-    "$modelPackagePrefix.users")
-registerOpenApiTask(openApiCargoApiTask, "Генерация API для сущности грузов (cargo)",
-    "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo")
+    "$modelPackagePrefix.users"
+)
+registerOpenApiTask(
+    openApiCargoApiTask, "Генерация API для сущности грузов (cargo)",
+    "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo"
+)
 
 sourceSets {
     main {

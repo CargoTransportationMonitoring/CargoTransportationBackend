@@ -8,5 +8,11 @@ spring:
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: true
+
 server:
-  port: 8080
+  port: 8081
+
+
+eureka:
+  client:
+    enabled: false

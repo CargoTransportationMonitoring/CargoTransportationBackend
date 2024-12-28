@@ -34,4 +34,9 @@ class ControllerExceptionHandler : ResponseEntityExceptionHandler() {
             .contentType(MediaType.APPLICATION_JSON)
             .body(ApiException(status, message))
     }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handleAccessDeniedException(exception: AccessDeniedException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied")
+    }
 }

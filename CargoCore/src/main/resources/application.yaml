@@ -8,8 +8,13 @@ spring:
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/cargotransportation-realm/protocol/openid-connect/certs
 server:
-  port: ${random.int[8080,8083]}
+  port: 8081
 
 eureka:
   instance:
@@ -17,3 +22,15 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+keycloak:
+  auth-server-url: http://localhost:8080
+  resource: user-manage-client
+  realm: cargotransportation-realm
+  use-resource-role-mappings: true
+  ssl-required: external
+  credentials:
+    secret: oUz5y5x5A9Z6PChPadWEm55X2socNNQR
+
+client:
+  url: http://localhost:3000

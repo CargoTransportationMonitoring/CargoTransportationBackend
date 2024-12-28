@@ -21,28 +21,6 @@ paths:
                   $ref: '#/components/schemas/GetUserResponse'
       tags:
         - User
-  /api/v1/user/{userId}:
-    get:
-      summary: Получить пользователя по id
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-          description: Идентификатор пользователя
-      responses:
-        '200':
-          description: Пользователь найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetUserResponse'
-        '404':
-          description: Пользователь не найден
-      tags:
-        - User
   /api/v1/user/register:
     post:
       summary: Зарегистрировать нового пользователя
@@ -63,6 +41,95 @@ paths:
           description: Ошибка валидации данных
       tags:
         - User
+  /api/v1/user/{userId}:
+    get:
+      summary: Получить пользователя по id
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор пользователя
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '404':
+          description: Пользователь не найден
+      tags:
+        - User
+
+    put:
+      summary: Обновить данные пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Пользователь успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '400':
+          description: Ошибка валидации данных
+        '404':
+          description: Пользователь не найден
+      tags:
+        - User
+
+    delete:
+      summary: Удалить данные о пользователе
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор пользователя
+      responses:
+        '204':
+          description: Пользователь успешно удален
+        '400':
+          description: Ошибка валидации данных
+        '404':
+          description: Пользователь не найден
+      tags:
+        - User
+
+  /api/v1/user/link:
+    post:
+      summary: Привязать пользователя к админу
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkUserRequest'
+      responses:
+        '201':
+          description: Пользователь успешно привязан к роли
+        '400':
+          description: Ошибка валидации данных
+        '404':
+          description: Пользователь или роль не найдены
+      tags:
+        - User
+
 
 components:
   schemas:
@@ -70,8 +137,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          minimum: 1
+          type: string
         username:
           type: string
     RegisterUserRequest:
@@ -95,3 +161,34 @@ components:
           type: string
           format: email
           description: Должен быть валидный email
+    UpdateUserRequest:
+      type: object
+      required:
+        - password
+        - email
+        - userId
+      properties:
+        userId:
+          type: string
+          description: Уникальный идентификатор пользователя
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          description: Пароль должен быть не менее 8 символов
+        email:
+          type: string
+          format: email
+          description: Должен быть валидный email
+    LinkUserRequest:
+      type: object
+      required:
+        - userId
+        - adminId
+      properties:
+        userId:
+          type: string
+          description: Идентификатор пользователя
+        adminId:
+          type: string
+          description: Идентификатор админа
