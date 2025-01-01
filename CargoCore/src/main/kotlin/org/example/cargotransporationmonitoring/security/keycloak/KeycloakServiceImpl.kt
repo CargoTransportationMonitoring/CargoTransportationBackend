@@ -80,11 +80,10 @@ class KeycloakServiceImpl : KeycloakService {
         return usersResource[userId].toRepresentation()
     }
 
-    override fun updateKeyCloakUser(userId: String, updateUserRequest: UpdateUserRequest) {
-        val credentialRepresentation = createPassword(updateUserRequest.password)
+    override fun updateKeyCloakUser(updateUserRequest: UpdateUserRequest) {
         val kcUser = UserRepresentation().apply {
-            email = updateUserRequest.email
-            credentials = listOf(credentialRepresentation)
+            firstName = updateUserRequest.name
+            lastName = updateUserRequest.surname
         }
         val uniqueUsersResource = usersResource[updateUserRequest.userId]
         uniqueUsersResource.update(kcUser)

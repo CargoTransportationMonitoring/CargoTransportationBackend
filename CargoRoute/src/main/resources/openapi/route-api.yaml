@@ -1,0 +1,169 @@
+openapi: 3.1.0
+info:
+  title: Cargo Tracking API
+  version: 1.0.0
+
+tags:
+  - name: Route
+    description: Route API
+
+paths:
+  /api/v1/routes:
+    post:
+      summary: Создать новый маршрут
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRouteRequest'
+      responses:
+        '201':
+          description: Маршрут успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRouteResponse'
+        '400':
+          description: Ошибка валидации данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Недостаточно прав для выполнения операции
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Route
+
+  /api/v1/routes/{routeId}:
+    get:
+      summary: Получить информацию о маршруте
+      parameters:
+        - name: routeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор маршрута
+      responses:
+        '200':
+          description: Информация о маршруте
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRouteResponse'
+        '404':
+          description: Маршрут не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Route
+
+    put:
+      summary: Обновить маршрут
+      parameters:
+        - name: routeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор маршрута
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRouteRequest'
+      responses:
+        '200':
+          description: Маршрут успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRouteResponse'
+        '400':
+          description: Ошибка валидации данных
+        '403':
+          description: Недостаточно прав для выполнения операции
+        '404':
+          description: Маршрут не найден
+      tags:
+        - Route
+
+    delete:
+      summary: Удалить маршрут
+      parameters:
+        - name: routeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Идентификатор маршрута
+      responses:
+        '204':
+          description: Маршрут успешно удален
+        '403':
+          description: Недостаточно прав для выполнения операции
+        '404':
+          description: Маршрут не найден
+      tags:
+        - Route
+
+components:
+  schemas:
+    CreateRouteRequest:
+      type: object
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+                format: float
+              longitude:
+                type: number
+                format: float
+          description: Массив координат маршрута
+      required:
+        - coordinates
+
+    GetRouteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор созданного маршрута
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+                format: float
+              longitude:
+                type: number
+                format: float
+          description: Массив координат маршрута
+      required:
+        - id
+        - coordinates
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Описание ошибки

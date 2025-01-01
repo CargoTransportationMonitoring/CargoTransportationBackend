@@ -13,30 +13,30 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 class ControllerExceptionHandler : ResponseEntityExceptionHandler() {
 
-    @ExceptionHandler(Exception::class)
-    protected fun handleException(
-        request: HttpServletRequest?,
-        ex: Exception
-    ): ResponseEntity<ApiException> {
-        var status = HttpStatus.INTERNAL_SERVER_ERROR.value()
-        val message = ex.message
-
-        val responseStatus = AnnotationUtils.findAnnotation(
-            ex.javaClass,
-            ResponseStatus::class.java
-        )
-        if (responseStatus != null) {
-            status = responseStatus.value.value()
-        }
-        logger.error(message)
-
-        return ResponseEntity.status(status)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(ApiException(status, message))
-    }
-
-    @ExceptionHandler(AccessDeniedException::class)
-    fun handleAccessDeniedException(exception: AccessDeniedException): ResponseEntity<String> {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied")
-    }
+//    @ExceptionHandler(Exception::class)
+//    protected fun handleException(
+//        request: HttpServletRequest?,
+//        ex: Exception
+//    ): ResponseEntity<ApiException> {
+//        var status = HttpStatus.INTERNAL_SERVER_ERROR.value()
+//        val message = ex.message
+//
+//        val responseStatus = AnnotationUtils.findAnnotation(
+//            ex.javaClass,
+//            ResponseStatus::class.java
+//        )
+//        if (responseStatus != null) {
+//            status = responseStatus.value.value()
+//        }
+//        logger.error(message)
+//
+//        return ResponseEntity.status(status)
+//            .contentType(MediaType.APPLICATION_JSON)
+//            .body(ApiException(status, message))
+//    }
+//
+//    @ExceptionHandler(AccessDeniedException::class)
+//    fun handleAccessDeniedException(exception: AccessDeniedException): ResponseEntity<String> {
+//        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied")
+//    }
 }

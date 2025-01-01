@@ -34,7 +34,7 @@ val testContainersVersion = "1.20.1"
 val keyCloakAdminVersion = "25.0.6"
 
 // openApi
-val openApiSpecDir = "$rootDir/CargoCore/src/main/resources/openapi"
+val openApiSpecDir = "$rootDir/CargoRoute/src/main/resources/openapi"
 val openApiGeneratedApiDir = layout.buildDirectory.dir("generated").get().toString()
 val openApiAdditionalProperties = mapOf("useJakartaEe" to "true")
 val configOptionsUse = mapOf(
@@ -49,8 +49,7 @@ val modelPackagePrefix = "com.example.model"
 val openApiSrcDir = "generated/src/main/java"
 
 // taskNames
-val openApiUsersApiTask = "openApiUsersApi"
-val openApiCargoApiTask = "openApiCargoApi"
+val openApiRouteApiTask = "openApiRouteApi"
 
 extra["springCloudVersion"] = "2023.0.4"
 
@@ -131,14 +130,8 @@ fun registerOpenApiTask(
 }
 
 registerOpenApiTask(
-    openApiUsersApiTask, "Генерация API для сущности пользователей (users)",
-    "users-api.yaml", "$apiPackagePrefix.users",
-    "$modelPackagePrefix.users"
-)
-
-registerOpenApiTask(
-    openApiCargoApiTask, "Генерация API для сущности грузов (cargo)",
-    "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo"
+    openApiRouteApiTask, "Генерация API для сущности маршрутов (route)",
+    "route-api.yaml", "$apiPackagePrefix.route", "$modelPackagePrefix.route"
 )
 
 sourceSets {
@@ -150,7 +143,7 @@ sourceSets {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    dependsOn(tasks.named(openApiUsersApiTask), tasks.named(openApiCargoApiTask))
+    dependsOn(tasks.named(openApiRouteApiTask))
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjvm-default=all")
     }

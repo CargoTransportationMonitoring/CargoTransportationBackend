@@ -164,22 +164,17 @@ components:
     UpdateUserRequest:
       type: object
       required:
-        - password
-        - email
         - userId
+        - name
+        - surname
       properties:
         userId:
           type: string
           description: Уникальный идентификатор пользователя
-        password:
+        name:
           type: string
-          minLength: 8
-          maxLength: 100
-          description: Пароль должен быть не менее 8 символов
-        email:
+        surname:
           type: string
-          format: email
-          description: Должен быть валидный email
     LinkUserRequest:
       type: object
       required:

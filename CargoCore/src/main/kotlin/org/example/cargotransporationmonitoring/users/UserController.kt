@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class UserController(
     private val keycloakService: KeycloakService
-) : UserApi {
+) : UserApi, CustomUserApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(UserController::class.java)
@@ -59,9 +59,15 @@ class UserController(
     }
 
     @PreAuthorize("hasAnyRole('admin', 'user')")
-    override fun apiV1UserUserIdPut(userId: String, updateUserRequest: UpdateUserRequest): ResponseEntity<GetUserResponse> {
-        keycloakService.updateKeyCloakUser(userId, updateUserRequest)
-        return ResponseEntity.noContent().build()
+    override fun apiV1UserUserIdPut(
+        userId: String,
+        updateUserRequest: UpdateUserRequest,
+    ): ResponseEntity<GetUserResponse> {
+        if (userId != updateUserRequest.userId) {
+            return ResponseEntity.badRequest().build()
+        }
+        keycloakService.updateKeyCloakUser(updateUserRequest)
+        return ResponseEntity.ok().build()
     }
 
     @PreAuthorize("hasRole('admin')")

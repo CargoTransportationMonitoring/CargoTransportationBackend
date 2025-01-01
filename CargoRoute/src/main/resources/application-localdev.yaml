@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: CargoTransportationMonitoringCore
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+server:
+  port: 8082
+
+eureka:
+  client:
+    enabled: false
