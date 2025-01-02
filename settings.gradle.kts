@@ -1,4 +1,4 @@
-rootProject.name = "CargoTransporationMonitoring"
+rootProject.name = "CargoTransporationBackend"
 
 include("CargoCore")
 include("CargoRoute")

@@ -1,4 +1,4 @@
-package org.example.cargotransporationmonitoring.security.converter
+package org.example.cargoroute.security.converter
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority

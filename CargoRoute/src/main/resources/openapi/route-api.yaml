@@ -39,6 +39,35 @@ paths:
       tags:
         - Route
 
+    get:
+      summary: Получить список маршрутов
+      description: Возвращает список маршрутов с поддержкой пагинации.
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы, начиная с 0.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/PaginationResponse'
+
   /api/v1/routes/{routeId}:
     get:
       summary: Получить информацию о маршруте
@@ -47,8 +76,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            minimum: 1
+            type: string
           description: Идентификатор маршрута
       responses:
         '200':
@@ -73,8 +101,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            minimum: 1
+            type: string
           description: Идентификатор маршрута
       requestBody:
         required: true
@@ -105,8 +132,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            minimum: 1
+            type: string
           description: Идентификатор маршрута
       responses:
         '204':
@@ -120,6 +146,40 @@ paths:
 
 components:
   schemas:
+    PaginationResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            type: string
+            description: Список идентификаторов маршрутов.
+        totalPages:
+          type: integer
+          description: Общее количество страниц.
+        totalElements:
+          type: integer
+          description: Общее количество элементов.
+        last:
+          type: boolean
+          description: Признак последней страницы.
+        size:
+          type: integer
+          minimum: 1
+          description: Количество элементов на странице.
+        number:
+          type: integer
+          minimum: 0
+          description: Номер текущей страницы.
+        numberOfElements:
+          type: integer
+          description: Количество элементов на текущей странице.
+        first:
+          type: boolean
+          description: Признак первой страницы.
+        empty:
+          type: boolean
+          description: Признак пустой страницы.
     CreateRouteRequest:
       type: object
       properties:
@@ -137,13 +197,11 @@ components:
           description: Массив координат маршрута
       required:
         - coordinates
-
     GetRouteResponse:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
           description: Уникальный идентификатор созданного маршрута
         coordinates:
           type: array
@@ -156,11 +214,12 @@ components:
               longitude:
                 type: number
                 format: float
+              isVisited:
+                type: boolean
           description: Массив координат маршрута
       required:
         - id
         - coordinates
-
     ErrorResponse:
       type: object
       properties:

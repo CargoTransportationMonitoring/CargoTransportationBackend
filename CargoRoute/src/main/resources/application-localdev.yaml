@@ -2,12 +2,14 @@ spring:
   application:
     name: CargoTransportationMonitoringCore
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/route
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: true
+  jpa:
+    show-sql: true
 server:
   port: 8082
 
