@@ -1,11 +1,10 @@
-package org.example.cargotransporationmonitoring.security.config
+package org.example.cargoroute.security.config
 
 import jakarta.servlet.http.HttpServletResponse
-import org.example.cargotransporationmonitoring.security.converter.KCRoleConverter
+import org.example.cargoroute.security.converter.KCRoleConverter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -28,7 +27,6 @@ class SpringSecurityConfig {
         httpSecurity
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->
@@ -54,7 +52,6 @@ class SpringSecurityConfig {
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration().applyPermitDefaultValues()
         corsConfiguration.allowedOrigins = listOf(clientUrl)
-        println("clientUrl $clientUrl")
         corsConfiguration.allowedHeaders = listOf("*")
         corsConfiguration.allowedMethods = listOf("*")
         val source = UrlBasedCorsConfigurationSource()

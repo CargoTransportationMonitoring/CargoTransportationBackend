@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: CargoRoute
+  datasource:
+    url: jdbc:postgresql://localhost:5432/route
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/cargotransportation-realm/protocol/openid-connect/certs
+server:
+  port: 8082
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+client:
+  url: http://localhost:3000

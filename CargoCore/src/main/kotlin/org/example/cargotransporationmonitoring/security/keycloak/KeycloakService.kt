@@ -32,7 +32,7 @@ interface KeycloakService {
     /**
      * Update a user in Keycloak
      */
-    fun updateKeyCloakUser(userId: String, updateUserRequest: UpdateUserRequest)
+    fun updateKeyCloakUser(updateUserRequest: UpdateUserRequest)
 
     /**
      * Link a user to a group in Keycloak
