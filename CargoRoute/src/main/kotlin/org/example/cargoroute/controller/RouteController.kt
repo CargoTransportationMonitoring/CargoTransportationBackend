@@ -44,4 +44,11 @@ class RouteController(
             return ResponseEntity.ok().body(it)
         }
     }
+
+    @PreAuthorize("hasRole('admin')")
+    override fun apiV1RoutesRouteIdPut(routeId: String, createRouteRequest: CreateRouteRequest): ResponseEntity<GetRouteResponse> {
+        routeService.updateRoute(routeId, createRouteRequest).let {
+            return ResponseEntity.ok().body(it)
+        }
+    }
 }

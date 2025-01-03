@@ -25,4 +25,9 @@ interface RouteService {
      * Find all routes
      */
     fun findPaging(page: Int, size: Int): PaginationResponse
+
+    /**
+     * Update Route
+     */
+    fun updateRoute(routeId: String, createRouteRequest: CreateRouteRequest): GetRouteResponse
 }

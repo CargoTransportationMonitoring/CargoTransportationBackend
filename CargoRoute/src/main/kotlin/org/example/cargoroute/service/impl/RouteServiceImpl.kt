@@ -1,6 +1,7 @@
 package org.example.cargoroute.service.impl
 
 import com.example.model.route.*
+import jakarta.persistence.EntityManager
 import org.example.cargoroute.entity.CoordinateEntity
 import org.example.cargoroute.repository.CoordinateRepository
 import org.example.cargoroute.service.RouteService
@@ -13,7 +14,8 @@ import java.util.UUID
 
 @Service
 class RouteServiceImpl(
-    private val coordinateRepository: CoordinateRepository
+    private val coordinateRepository: CoordinateRepository,
+    private val entityManager: EntityManager
 ) : RouteService {
 
     override fun createRoute(route: CreateRouteRequest): GetRouteResponse {
@@ -46,13 +48,23 @@ class RouteServiceImpl(
         }
     }
 
+    @Transactional
+    override fun updateRoute(routeId: String, createRouteRequest: CreateRouteRequest): GetRouteResponse {
+        coordinateRepository.deleteByRouteId(routeId)
+        entityManager.flush()
+        val coordinates = coordinatesToEntity(createRouteRequest.coordinates, routeId)
+        return buildGetRouteResponse(coordinateRepository.saveAll(coordinates))
+    }
+
     private fun buildGetRouteResponse(coordinates: List<CoordinateEntity>): GetRouteResponse {
         if (coordinates.isEmpty()) {
             return GetRouteResponse()
         }
+        val sortedCoordinates = coordinates.sortedBy { it.order }
+
         return GetRouteResponse().apply {
-            this.id = coordinates.first().routeId
-            this.coordinates = coordinates.map { coordinate ->
+            this.id = sortedCoordinates.first().routeId
+            this.coordinates = sortedCoordinates.map { coordinate ->
                 GetRouteResponseCoordinatesInner().apply {
                     latitude = coordinate.latitude.toFloat()
                     longitude = coordinate.longitude.toFloat()
@@ -62,13 +74,16 @@ class RouteServiceImpl(
         }
     }
 
-    private fun coordinatesToEntity(coordinates: List<CreateRouteRequestCoordinatesInner>): List<CoordinateEntity> {
-        val generatedRouteId = UUID.randomUUID().toString()
+    private fun coordinatesToEntity(
+        coordinates: List<CreateRouteRequestCoordinatesInner>,
+        routeId: String? = null
+    ): List<CoordinateEntity> {
+        val generatedRouteId = routeId.takeIf { !it.isNullOrBlank() } ?: UUID.randomUUID().toString()
         return coordinates.mapIndexed { index, coordinate ->
             CoordinateEntity.Builder().apply {
                 latitude = coordinate.latitude.toDouble()
                 longitude = coordinate.longitude.toDouble()
-                routeId = generatedRouteId
+                this.routeId = generatedRouteId
                 isVisited = false
                 order = index
             }.build()
