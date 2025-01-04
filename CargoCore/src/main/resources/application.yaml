@@ -34,3 +34,7 @@ keycloak:
 
 client:
   url: http://localhost:3000
+
+
+secret:
+  key: 1234567890101112

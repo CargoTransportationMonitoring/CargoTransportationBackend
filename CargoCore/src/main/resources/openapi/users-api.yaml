@@ -111,26 +111,6 @@ paths:
       tags:
         - User
 
-  /api/v1/user/link:
-    post:
-      summary: Привязать пользователя к админу
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LinkUserRequest'
-      responses:
-        '201':
-          description: Пользователь успешно привязан к роли
-        '400':
-          description: Ошибка валидации данных
-        '404':
-          description: Пользователь или роль не найдены
-      tags:
-        - User
-
-
 components:
   schemas:
     GetUserResponse:
@@ -178,12 +158,8 @@ components:
     LinkUserRequest:
       type: object
       required:
-        - userId
-        - adminId
+        - code
       properties:
-        userId:
+        code:
           type: string
-          description: Идентификатор пользователя
-        adminId:
-          type: string
-          description: Идентификатор админа
+          description: Зашифрованный одноразовый персональный код линковки пользователя к администратору

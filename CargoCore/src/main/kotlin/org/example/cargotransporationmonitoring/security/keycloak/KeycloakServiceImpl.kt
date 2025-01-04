@@ -1,6 +1,5 @@
 package org.example.cargotransporationmonitoring.security.keycloak
 
-import com.example.model.users.LinkUserRequest
 import com.example.model.users.RegisterUserRequest
 import com.example.model.users.UpdateUserRequest
 import jakarta.annotation.PostConstruct
@@ -89,31 +88,40 @@ class KeycloakServiceImpl : KeycloakService {
         uniqueUsersResource.update(kcUser)
     }
 
-    override fun linkUserToAdmin(linkUserRequest: LinkUserRequest) {
-        val userResource = usersResource[linkUserRequest.userId]
+    override fun linkUserToAdmin(userId: String, adminId: String) {
+        checkUserAlreadyLinked(userId)
+        val kcUser = UserRepresentation().apply {
+            federationLink = adminId
+        }
+        val uniqueUsersResource = usersResource[userId]
+        uniqueUsersResource.update(kcUser)
+    }
+
+    private fun checkUserAlreadyLinked(userId: String) {
+        val userResource = realmResource.users()[userId]
         val userRepresentation = userResource.toRepresentation()
-
-        val attributes = userRepresentation.attributes ?: mutableMapOf()
-        require(!attributes.containsKey(ADMIN_ID)) { "User is already linked to an admin" }
-
-        attributes[ADMIN_ID] = listOf(linkUserRequest.adminId)
-        userRepresentation.attributes = attributes
-
-        userResource.update(userRepresentation)
+        require(userRepresentation.federationLink.isNullOrBlank()) { "User is already linked to an admin" }
     }
 
     override fun unlinkUserFromAdmin(userId: String) {
-        val userResource = usersResource[userId]
-        val userRepresentation = userResource.toRepresentation()
-
-        val attributes = userRepresentation.attributes ?: mutableMapOf()
-
-        attributes.remove(ADMIN_ID)
-        userRepresentation.attributes = attributes
-
-        userResource.update(userRepresentation)
+        val kcUser = UserRepresentation().apply {
+            federationLink = null
+        }
+        val uniqueUsersResource = usersResource[userId]
+        uniqueUsersResource.update(kcUser)
     }
 
+    override fun getUserIdByUsername(username: String): String? {
+        val users = realmResource.users()
+        val userSearchResults = users.search(username)
+        val userRepresentation = userSearchResults.firstOrNull { it.username == username }
+        return userRepresentation?.id
+    }
+
+    override fun getUsernameByUserId(userId: String): String {
+        val userResource = usersResource[userId]
+        return userResource.toRepresentation().username
+    }
 
     private fun createPassword(password: String): CredentialRepresentation {
         return CredentialRepresentation().apply {

@@ -1,6 +1,5 @@
 package org.example.cargotransporationmonitoring.security.keycloak
 
-import com.example.model.users.LinkUserRequest
 import com.example.model.users.RegisterUserRequest
 import com.example.model.users.UpdateUserRequest
 import jakarta.ws.rs.core.Response
@@ -37,10 +36,17 @@ interface KeycloakService {
     /**
      * Link a user to a group in Keycloak
      */
-    fun linkUserToAdmin(linkUserRequest: LinkUserRequest)
+    fun linkUserToAdmin(userId: String, adminId: String)
 
     /**
      * Unlink a user from a group in Keycloak
      */
     fun unlinkUserFromAdmin(userId: String)
+
+    /**
+     * get userId by username
+     */
+    fun getUserIdByUsername(username: String): String?
+
+    fun getUsernameByUserId(userId: String): String
 }
