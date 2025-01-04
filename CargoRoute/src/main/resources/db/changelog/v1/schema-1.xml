@@ -7,6 +7,33 @@
     <changeSet id="1" author="ndivanov">
         <preConditions onFail="MARK_RAN">
             <not>
+                <tableExists tableName="route"/>
+            </not>
+        </preConditions>
+        <createTable tableName="route">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assigned_username" type="varchar(256)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <createSequence sequenceName="route_seq" startValue="1" incrementBy="1"/>
+
+        <!-- Настройка столбца id для использования последовательности -->
+        <addDefaultValue tableName="route" columnName="id" defaultValueSequenceNext="route_seq"/>
+    </changeSet>
+
+    <changeSet id="2" author="ndivanov">
+        <preConditions onFail="MARK_RAN">
+            <not>
                 <tableExists tableName="coordinate"/>
             </not>
         </preConditions>
@@ -23,7 +50,7 @@
             <column name="longitude" type="double precision">
                 <constraints nullable="false"/>
             </column>
-            <column name="route_id" type="varchar(256)">
+            <column name="route_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="is_visited" type="boolean">
@@ -38,6 +65,19 @@
                 tableName="coordinate"
                 columnNames="route_id, order"
                 constraintName="uq_coordinate_route_order"/>
+
+        <addForeignKeyConstraint
+                baseTableName="coordinate"
+                baseColumnNames="route_id"
+                referencedTableName="route"
+                referencedColumnNames="id"
+                constraintName="fk_coordinate_route"
+                onDelete="CASCADE"/>
+
+        <createSequence sequenceName="coordinate_seq" startValue="1" incrementBy="1"/>
+
+        <!-- Настройка столбца id для использования последовательности -->
+        <addDefaultValue tableName="coordinate" columnName="id" defaultValueSequenceNext="coordinate_seq"/>
     </changeSet>
 
 </databaseChangeLog>

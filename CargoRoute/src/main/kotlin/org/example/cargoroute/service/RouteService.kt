@@ -14,12 +14,12 @@ interface RouteService {
     /**
      * Delete a route
      */
-    fun deleteRoute(routeId: String)
+    fun deleteRoute(routeId: Long)
 
     /**
      * Find a route by id
      */
-    fun findById(routeId: String): GetRouteResponse
+    fun findById(routeId: Long): GetRouteResponse
 
     /**
      * Find all routes
@@ -27,7 +27,12 @@ interface RouteService {
     fun findPaging(page: Int, size: Int): PaginationResponse
 
     /**
+     * Find all routes by user
+     */
+    fun findPaging(page: Int, size: Int, userId: String): PaginationResponse
+
+    /**
      * Update Route
      */
-    fun updateRoute(routeId: String, createRouteRequest: CreateRouteRequest): GetRouteResponse
+    fun updateRoute(routeId: Long, createRouteRequest: CreateRouteRequest): GetRouteResponse
 }

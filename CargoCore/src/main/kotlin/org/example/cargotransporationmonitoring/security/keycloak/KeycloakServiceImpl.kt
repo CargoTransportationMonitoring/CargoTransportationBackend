@@ -34,10 +34,6 @@ class KeycloakServiceImpl : KeycloakService {
     private lateinit var realmResource: RealmResource
     private lateinit var usersResource: UsersResource
 
-    companion object {
-        private const val ADMIN_ID = "adminId"
-    }
-
     @PostConstruct
     fun init() {
         keycloak = KeycloakBuilder.builder()

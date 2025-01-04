@@ -18,9 +18,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetUserResponse'
+                  type: string
       tags:
         - User
+
   /api/v1/user/register:
     post:
       summary: Зарегистрировать нового пользователя

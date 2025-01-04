@@ -17,4 +17,9 @@ interface UserService {
      * Generate personal code for link
      */
     fun generateCode(username: String, adminId: String): String
+
+    /**
+     * Get all users by adminId
+     */
+    fun getUsersByAdmin(adminId: String): List<String>
 }

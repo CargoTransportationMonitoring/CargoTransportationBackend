@@ -25,3 +25,16 @@ eureka:
 
 client:
   url: http://localhost:3000
+
+core:
+  url: http://localhost:8081
+
+
+keycloak:
+  auth-server-url: http://localhost:8080
+  resource: user-manage-client
+  realm: cargotransportation-realm
+  use-resource-role-mappings: true
+  ssl-required: external
+  credentials:
+    secret: oUz5y5x5A9Z6PChPadWEm55X2socNNQR

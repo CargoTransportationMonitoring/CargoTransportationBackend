@@ -76,7 +76,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: long
           description: Идентификатор маршрута
       responses:
         '200':
@@ -101,7 +101,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: long
           description: Идентификатор маршрута
       requestBody:
         required: true
@@ -132,7 +132,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: long
           description: Идентификатор маршрута
       responses:
         '204':
@@ -144,6 +144,50 @@ paths:
       tags:
         - Route
 
+  /api/v1/routes/user/{userId}:
+    get:
+      summary: Получить список маршрутов пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id пользователя
+        - name: page
+          in: query
+          description: Номер страницы, начиная с 0.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/PaginationResponse'
+        '404':
+          description: Маршруты не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Route
+
+
 components:
   schemas:
     PaginationResponse:
@@ -152,7 +196,7 @@ components:
         content:
           type: array
           items:
-            type: string
+            type: long
             description: Список идентификаторов маршрутов.
         totalPages:
           type: integer
@@ -183,6 +227,18 @@ components:
     CreateRouteRequest:
       type: object
       properties:
+        id:
+          type: long
+          description: Уникальный идентификатор маршрута
+        name:
+          type: string
+          description: Название маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        assignedUsername:
+          type: string
+          description: Имя пользователя
         coordinates:
           type: array
           items:
@@ -201,8 +257,17 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: long
           description: Уникальный идентификатор созданного маршрута
+        name:
+          type: string
+          description: Название маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        assignedUsername:
+          type: string
+          description: Имя пользователя на которого назначен маршрут
         coordinates:
           type: array
           items:

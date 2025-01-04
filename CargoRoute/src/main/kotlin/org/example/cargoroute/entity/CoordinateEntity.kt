@@ -22,7 +22,7 @@ class CoordinateEntity private constructor(
     val longitude: Double,
 
     @Column(name = "route_id")
-    val routeId: String,
+    val routeId: Long,
 
     @Column(name = "is_visited")
     val isVisited: Boolean,
@@ -34,7 +34,7 @@ class CoordinateEntity private constructor(
         var id: Long? = null,
         var latitude: Double = 0.0,
         var longitude: Double = 0.0,
-        var routeId: String = "",
+        var routeId: Long = 0,
         var isVisited: Boolean = false,
         var order: Int = 0
     ) {

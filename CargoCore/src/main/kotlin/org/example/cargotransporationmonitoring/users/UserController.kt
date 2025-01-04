@@ -77,8 +77,8 @@ class UserController(
     }
 
     @PreAuthorize("hasRole('admin')")
-    override fun apiV1UsersGet(): ResponseEntity<List<GetUserResponse>> {
-        return ResponseEntity.ok(listOf(GetUserResponse()))
+    override fun apiV1UsersGet(): ResponseEntity<List<String>>? {
+        return ResponseEntity.ok().body(userService.getUsersByAdmin(getCurrentUserId()))
     }
 
     @PreAuthorize("hasRole('user')")
