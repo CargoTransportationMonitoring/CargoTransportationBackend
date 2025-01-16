@@ -85,6 +85,16 @@ class RouteServiceImpl(
         return buildGetRouteResponse(coordinateRepository.saveAll(coordinates), updatedRouteEntity)
     }
 
+    override fun markPoints(
+        routeId: Long,
+        points: List<ApiV1RoutesMarkPointsRouteIdPutRequestInner>
+    ): GetRouteResponse {
+        val coordinatesMap: Map<Long, CoordinateEntity> = coordinateRepository.findByRouteId(routeId).associateBy { it.id!! }
+        points.forEach { coordinatesMap[it.id]?.isVisited = it.isVisited }
+        coordinateRepository.saveAll(coordinatesMap.values)
+        return findById(routeId)
+    }
+
     private fun buildPaginationResponse(routeEntityPage: Page<RouteEntity>): PaginationResponse {
         return PaginationResponse().apply {
             content = routeEntityPage.content.map { it.id }
@@ -108,7 +118,8 @@ class RouteServiceImpl(
         return GetRouteResponse().apply {
             this.id = sortedCoordinates.first().routeId
             this.coordinates = sortedCoordinates.map { coordinate ->
-                GetRouteResponseCoordinatesInner().apply {
+                ApiV1RoutesMarkPointsRouteIdPutRequestInner().apply {
+                    id = coordinate.id
                     latitude = coordinate.latitude.toFloat()
                     longitude = coordinate.longitude.toFloat()
                     isVisited = coordinate.isVisited

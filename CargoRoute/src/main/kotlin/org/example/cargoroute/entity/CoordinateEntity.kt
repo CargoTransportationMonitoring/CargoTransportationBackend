@@ -25,7 +25,7 @@ class CoordinateEntity private constructor(
     val routeId: Long,
 
     @Column(name = "is_visited")
-    val isVisited: Boolean,
+    var isVisited: Boolean,
 
     @Column(name = "\"order\"")
     val order: Int

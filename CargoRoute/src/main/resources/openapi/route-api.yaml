@@ -144,6 +144,49 @@ paths:
       tags:
         - Route
 
+  /api/v1/routes/markPoints/{routeId}:
+    put:
+      summary: Пометить точку маршрута как посещенную
+      parameters:
+        - name: routeId
+          in: path
+          required: true
+          schema:
+            type: long
+          description: Идентификатор маршрута
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+                  isVisited:
+                    type: boolean
+                  id:
+                    type: long
+              description: Массив координат маршрута
+      responses:
+        '200':
+          description: Успешное выполнение
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/GetRouteResponse'
+        '400':
+          description: Ошибка запроса
+        '404':
+          description: Маршрут не найден
+
   /api/v1/routes/user/{userId}:
     get:
       summary: Получить список маршрутов пользователя
@@ -281,6 +324,8 @@ components:
                 format: float
               isVisited:
                 type: boolean
+              id:
+                type: long
           description: Массив координат маршрута
       required:
         - id

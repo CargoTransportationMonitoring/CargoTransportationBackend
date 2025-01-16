@@ -2,6 +2,7 @@ package org.example.cargoroute.controller
 
 import com.example.api.route.DefaultApi
 import com.example.api.route.RouteApi
+import com.example.model.route.ApiV1RoutesMarkPointsRouteIdPutRequestInner
 import com.example.model.route.CreateRouteRequest
 import com.example.model.route.GetRouteResponse
 import com.example.model.route.PaginationResponse
@@ -56,6 +57,14 @@ class RouteController(
         routeService.updateRoute(routeId, createRouteRequest).let {
             return ResponseEntity.ok().body(it)
         }
+    }
+
+    @PreAuthorize("hasRole('user')")
+    override fun apiV1RoutesMarkPointsRouteIdPut(
+        routeId: Long,
+        apiV1RoutesMarkPointsRouteIdPutRequestInner: List<ApiV1RoutesMarkPointsRouteIdPutRequestInner>
+    ): ResponseEntity<GetRouteResponse> {
+        return ResponseEntity.ok().body(routeService.markPoints(routeId, apiV1RoutesMarkPointsRouteIdPutRequestInner))
     }
 
     private fun isAdmin(): Boolean {

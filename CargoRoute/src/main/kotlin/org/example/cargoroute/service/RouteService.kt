@@ -1,5 +1,6 @@
 package org.example.cargoroute.service
 
+import com.example.model.route.ApiV1RoutesMarkPointsRouteIdPutRequestInner
 import com.example.model.route.CreateRouteRequest
 import com.example.model.route.GetRouteResponse
 import com.example.model.route.PaginationResponse
@@ -35,4 +36,9 @@ interface RouteService {
      * Update Route
      */
     fun updateRoute(routeId: Long, createRouteRequest: CreateRouteRequest): GetRouteResponse
+
+    /**
+     * Change points state
+     */
+    fun markPoints(routeId: Long, points: List<ApiV1RoutesMarkPointsRouteIdPutRequestInner>): GetRouteResponse
 }
