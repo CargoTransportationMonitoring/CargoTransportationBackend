@@ -23,12 +23,20 @@ class SpringSecurityConfig {
     @Value("\${client.url}")
     private lateinit var clientUrl: String
 
+    @Value("\${route.service.url}")
+    private lateinit var routeServiceUrl: String
+
+    companion object {
+        private const val REGISTER_URL = "/api/v1/user/register"
+        private const val ACCESS_DENIED_ERROR = "Access Denied"
+    }
+
     @Bean
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         httpSecurity
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, REGISTER_URL).permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->
@@ -44,7 +52,7 @@ class SpringSecurityConfig {
             }
             .exceptionHandling { exceptions ->
                 exceptions.accessDeniedHandler { _, response, _ ->
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied")
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, ACCESS_DENIED_ERROR)
                 }
             }
         return httpSecurity.build()
@@ -53,8 +61,7 @@ class SpringSecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration().applyPermitDefaultValues()
-        corsConfiguration.allowedOrigins = listOf(clientUrl)
-        println("clientUrl $clientUrl")
+        corsConfiguration.allowedOrigins = listOf(clientUrl, routeServiceUrl)
         corsConfiguration.allowedHeaders = listOf("*")
         corsConfiguration.allowedMethods = listOf("*")
         val source = UrlBasedCorsConfigurationSource()

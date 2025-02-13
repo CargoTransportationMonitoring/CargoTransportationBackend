@@ -1,6 +1,6 @@
-package org.example.cargotransporationmonitoring.users.repository
+package org.example.cargotransporationmonitoring.repository
 
-import org.example.cargotransporationmonitoring.users.entity.UserAdmin
+import org.example.cargotransporationmonitoring.entity.UserAdmin
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
@@ -13,4 +13,10 @@ interface UserAdminRepository : CrudRepository<UserAdmin, String> {
     @Modifying
     @Query("DELETE FROM user_admin WHERE user_id = :userId")
     fun deleteByUserId(userId: String): Int
+
+    @Query("SELECT * FROM user_admin where admin_id = :adminId and user_id = :userId")
+    fun findByAdminIdAndUserId(adminId: String, userId: String): UserAdmin?
+
+    @Query("SELECT * from user_admin where user_id = :userId")
+    fun findByUserId(userId: String): UserAdmin?
 }

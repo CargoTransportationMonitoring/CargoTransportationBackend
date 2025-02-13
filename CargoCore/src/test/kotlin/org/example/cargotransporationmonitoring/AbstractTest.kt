@@ -1,6 +1,7 @@
 package org.example.cargotransporationmonitoring
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -33,6 +34,12 @@ class AbstractTest {
         @JvmStatic
         fun setup() {
             postgres.start()
+        }
+
+        @AfterAll
+        @JvmStatic
+        fun cleanUp() {
+            postgres.stop()
         }
     }
 }

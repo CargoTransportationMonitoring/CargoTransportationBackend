@@ -13,7 +13,6 @@ class KCRoleConverter : Converter<Jwt, Collection<GrantedAuthority>> {
         private const val ROLES = "roles"
     }
 
-
     override fun convert(jwt: Jwt): Collection<GrantedAuthority> {
         val resourceAccess = jwt.claims[RESOURCE_ACCESS] as? Map<*, *> ?: return emptyList()
         val clientAccess = resourceAccess[CLIENT_ACCESS] as? Map<*, *> ?: return emptyList()

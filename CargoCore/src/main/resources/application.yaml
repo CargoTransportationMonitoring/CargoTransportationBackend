@@ -38,3 +38,7 @@ client:
 
 secret:
   key: 1234567890101112
+
+route:
+  service:
+    url: http://localhost:8082

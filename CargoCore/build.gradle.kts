@@ -4,7 +4,6 @@ plugins {
     id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.openapi.generator") version "7.9.0"
-//    id("org.jetbrains.kotlin.kapt") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
 }
 
@@ -58,8 +57,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-//    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-//    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion")
     implementation("org.openapitools:jackson-databind-nullable:$jacksonDatabindNullable")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -71,9 +69,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.keycloak:keycloak-admin-client:$keyCloakAdminVersion")
-//    kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
-//    runtimeOnly("org.postgresql:r2dbc-postgresql:$r2dbcVersion")
 
     // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -136,11 +132,6 @@ registerOpenApiTask(
     "$modelPackagePrefix.users"
 )
 
-registerOpenApiTask(
-    openApiCargoApiTask, "Генерация API для сущности грузов (cargo)",
-    "cargo-api.yaml", "$apiPackagePrefix.cargo", "$modelPackagePrefix.cargo"
-)
-
 sourceSets {
     main {
         java {
@@ -150,7 +141,7 @@ sourceSets {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    dependsOn(tasks.named(openApiUsersApiTask), tasks.named(openApiCargoApiTask))
+    dependsOn(tasks.named(openApiUsersApiTask))
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjvm-default=all")
     }

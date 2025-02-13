@@ -1,6 +1,6 @@
-package org.example.cargotransporationmonitoring.util.attachment
+package org.example.cargotransporationmonitoring.util
 
-import org.example.cargotransporationmonitoring.users.entity.UserAdmin
+import org.example.cargotransporationmonitoring.entity.UserAdmin
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import javax.crypto.Cipher
@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec
 import java.util.*
 
 @Component
-class TokenUtil {
+class LinkTokenUtil {
 
     @Value("\${secret.key}")
     private lateinit var secretKey: String

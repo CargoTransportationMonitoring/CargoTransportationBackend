@@ -5,24 +5,10 @@ info:
 
 tags:
   - name: User
-    description: Operations with users
-paths:
-  /api/v1/users:
-    get:
-      summary: Получить список пользователей
-      responses:
-        '200':
-          description: Список пользователей
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-      tags:
-        - User
+    description: Users API
 
-  /api/v1/user/register:
+paths:
+  /api/v1/user:
     post:
       summary: Зарегистрировать нового пользователя
       requestBody:
@@ -42,9 +28,12 @@ paths:
           description: Ошибка валидации данных
       tags:
         - User
+
   /api/v1/user/{userId}:
     get:
-      summary: Получить пользователя по id
+      summary: Получить пользователя по его userId
+      security:
+        - BearerAuth: []
       parameters:
         - name: userId
           in: path
@@ -59,6 +48,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetUserResponse'
+        '403':
+          description: Доступ запрещен. У пользователя недостаточно прав или он не авторизован.
         '404':
           description: Пользователь не найден
       tags:
@@ -66,6 +57,8 @@ paths:
 
     put:
       summary: Обновить данные пользователя
+      security:
+        - BearerAuth: []
       parameters:
         - name: userId
           in: path
@@ -86,6 +79,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetUserResponse'
+        '403':
+          description: Доступ запрещен. У пользователя недостаточно прав или он не авторизован.
         '400':
           description: Ошибка валидации данных
         '404':
@@ -94,7 +89,9 @@ paths:
         - User
 
     delete:
-      summary: Удалить данные о пользователе
+      summary: Удалить профиль пользователя
+      security:
+        - BearerAuth: [ ]
       parameters:
         - name: userId
           in: path
@@ -105,6 +102,8 @@ paths:
       responses:
         '204':
           description: Пользователь успешно удален
+        '403':
+          description: Доступ запрещен. У пользователя недостаточно прав или он не авторизован.
         '400':
           description: Ошибка валидации данных
         '404':
@@ -112,15 +111,166 @@ paths:
       tags:
         - User
 
+  /api/v1/users:
+    get:
+      summary: Получить список пользователей закрепленных за вами
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUserResponse'
+        '403':
+          description: Доступ запрещен. У пользователя недостаточно прав или он не авторизован.
+      tags:
+        - User
+
+  /api/v1/user/{userId}/link:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Идентификатор пользователя
+    put:
+      summary: Связывает пользователя с аккаунтом администратора
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkUserRequest'
+      responses:
+        '200':
+          description: Пользователь успешно связан.
+        '400':
+          description: Некорректные данные запроса.
+        '401':
+          description: Не авторизован.
+        '403':
+          description: Нет прав для выполнения этой операции.
+        '409':
+          description: Пользователь уже привязан к кому-то из администраторов
+      tags:
+        - User
+
+  /api/v1/user/{userId}/unlink:
+    put:
+      summary: Отвязывает пользователя от аккаунта администратора
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Идентификатор пользователя для отвязывания.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь успешно отвязан.
+        '400':
+          description: Некорректные данные запроса.
+        '401':
+          description: Не авторизован.
+        '403':
+          description: Нет прав для выполнения этой операции.
+      tags:
+        - User
+
+  /api/v1/user/generate-code:
+    get:
+      summary: Генерирует код для связывания пользователя.
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: Имя пользователя для генерации кода.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Код успешно сгенерирован.
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Некорректные данные запроса.
+        '401':
+          description: Не авторизован.
+        '403':
+          description: Нет прав для выполнения этой операции.
+      tags:
+        - User
+
+  /api/v1/user/{username}/details:
+    get:
+      summary: Получить детальную информацию о пользователе с маршрутами
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя пользователя
+      responses:
+        '200':
+          description: Детальная информация о пользователе успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserDetailsResponse'
+        '403':
+          description: Не хватает прав для просмотра
+        '404':
+          description: Пользователь не найден
+      tags:
+        - User
+
+
+  /api/v1/check-admin-membership:
+    get:
+      summary: Check if a user belongs to an admin
+      description: This endpoint checks if a user belongs to a specific admin using the provided userId and adminId.
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: The ID of the user to check.
+          schema:
+            type: string
+        - name: adminId
+          in: query
+          required: true
+          description: The ID of the admin to check against.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the check
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Bad request, missing or invalid parameters.
+      tags:
+        - User
+
 components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
-    GetUserResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        username:
-          type: string
     RegisterUserRequest:
       type: object
       required:
@@ -142,20 +292,18 @@ components:
           type: string
           format: email
           description: Должен быть валидный email
+
     UpdateUserRequest:
       type: object
       required:
-        - userId
         - name
         - surname
       properties:
-        userId:
-          type: string
-          description: Уникальный идентификатор пользователя
         name:
           type: string
         surname:
           type: string
+
     LinkUserRequest:
       type: object
       required:
@@ -164,3 +312,70 @@ components:
         code:
           type: string
           description: Зашифрованный одноразовый персональный код линковки пользователя к администратору
+
+    GetUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        adminUsername:
+          type: string
+
+    GetUserDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetRouteResponse'
+
+    GetRouteResponse:
+      type: object
+      properties:
+        id:
+          type: long
+          description: Уникальный идентификатор созданного маршрута
+        name:
+          type: string
+          description: Название маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        assignedUsername:
+          type: string
+          description: Имя пользователя на которого назначен маршрут
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+                format: float
+              longitude:
+                type: number
+                format: float
+              isVisited:
+                type: boolean
+              id:
+                type: long
+          description: Массив координат маршрута
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Описание ошибки
+        status:
+          type: string
+          description: Статус ошибки
+
+security:
+  - bearerAuth: [ ]

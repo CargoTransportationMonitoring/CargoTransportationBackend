@@ -1,4 +1,4 @@
-package org.example.cargotransporationmonitoring.users.entity
+package org.example.cargotransporationmonitoring.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table

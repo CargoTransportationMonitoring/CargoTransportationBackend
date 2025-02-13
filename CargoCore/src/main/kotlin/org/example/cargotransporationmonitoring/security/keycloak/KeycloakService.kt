@@ -2,8 +2,7 @@ package org.example.cargotransporationmonitoring.security.keycloak
 
 import com.example.model.users.RegisterUserRequest
 import com.example.model.users.UpdateUserRequest
-import jakarta.ws.rs.core.Response
-import org.example.cargotransporationmonitoring.users.Roles
+import org.example.cargotransporationmonitoring.entity.Roles
 import org.keycloak.representations.idm.UserRepresentation
 
 interface KeycloakService {
@@ -11,7 +10,7 @@ interface KeycloakService {
     /**
      * Create a new user in Keycloak
      */
-    fun createKeyCloakUser(request: RegisterUserRequest): Response
+    fun createKeyCloakUser(request: RegisterUserRequest): String
 
     /**
      * Add roles to a user in Keycloak
@@ -31,12 +30,7 @@ interface KeycloakService {
     /**
      * Update a user in Keycloak
      */
-    fun updateKeyCloakUser(updateUserRequest: UpdateUserRequest)
-
-    /**
-     * Link a user to a group in Keycloak
-     */
-    fun linkUserToAdmin(userId: String, adminId: String)
+    fun updateKeyCloakUser(userId: String, updateUserRequest: UpdateUserRequest)
 
     /**
      * Unlink a user from a group in Keycloak
@@ -46,7 +40,10 @@ interface KeycloakService {
     /**
      * get userId by username
      */
-    fun getUserIdByUsername(username: String): String?
+    fun tryGetUserIdByUsername(username: String): String?
 
+    /**
+     * get username by userId
+     */
     fun getUsernameByUserId(userId: String): String
 }
