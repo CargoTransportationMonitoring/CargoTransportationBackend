@@ -22,6 +22,13 @@ class SpringSecurityConfig {
     @Value("\${client.url}")
     private lateinit var clientUrl: String
 
+    @Value("\${core.service.url}")
+    private lateinit var coreServiceUrl: String
+
+    companion object {
+        private const val ACCESS_DENIED = "Access denied"
+    }
+
     @Bean
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         httpSecurity
@@ -42,7 +49,7 @@ class SpringSecurityConfig {
             }
             .exceptionHandling { exceptions ->
                 exceptions.accessDeniedHandler { _, response, _ ->
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied")
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, ACCESS_DENIED)
                 }
             }
         return httpSecurity.build()
@@ -51,7 +58,7 @@ class SpringSecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration().applyPermitDefaultValues()
-        corsConfiguration.allowedOrigins = listOf(clientUrl)
+        corsConfiguration.allowedOrigins = listOf(clientUrl, coreServiceUrl)
         corsConfiguration.allowedHeaders = listOf("*")
         corsConfiguration.allowedMethods = listOf("*")
         val source = UrlBasedCorsConfigurationSource()

@@ -198,7 +198,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/CodeGeneratedResponse'
         '400':
           description: Некорректные данные запроса.
         '401':
@@ -256,7 +256,7 @@ paths:
           content:
             application/json:
               schema:
-                type: boolean
+                $ref: '#/components/schemas/CheckAdminResponse'
         '400':
           description: Bad request, missing or invalid parameters.
       tags:
@@ -366,6 +366,20 @@ components:
               id:
                 type: long
           description: Массив координат маршрута
+
+    CheckAdminResponse:
+      type: object
+      properties:
+        isUserBelongAdmin:
+          type: boolean
+          description: флаг отвечающий за принадлежность пользователя к администратору
+
+    CodeGeneratedResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: уникальный индивидуальный код сгенерированный для привязки пользователя к администратору
 
     ErrorResponse:
       type: object

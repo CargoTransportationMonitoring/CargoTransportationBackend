@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CoordinateRepository : JpaRepository<CoordinateEntity, Long> {
 
-    fun deleteByRouteId(routeId: Long)
+    fun removeByRouteId(routeId: Long)
 
     fun findByRouteId(routeId: Long): List<CoordinateEntity>
 }

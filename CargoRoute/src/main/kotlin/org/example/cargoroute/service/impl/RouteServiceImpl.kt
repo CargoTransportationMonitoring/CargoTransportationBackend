@@ -2,38 +2,52 @@ package org.example.cargoroute.service.impl
 
 import com.example.model.route.*
 import jakarta.persistence.EntityManager
+import org.example.cargoroute.client.CoreClient
 import org.example.cargoroute.entity.CoordinateEntity
 import org.example.cargoroute.entity.RouteEntity
+import org.example.cargoroute.entity.RouteItemEntity
+import org.example.cargoroute.entity.RouteStatus
+import org.example.cargoroute.exception.ResourceNotFoundException
 import org.example.cargoroute.keycloak.KeycloakService
-import org.example.cargoroute.keycloak.KeycloakServiceImpl
+import org.example.cargoroute.mapper.CoordinatesMapper.coordinatesToEntity
 import org.example.cargoroute.repository.CoordinateRepository
 import org.example.cargoroute.repository.RouteRepository
 import org.example.cargoroute.service.RouteService
+import org.example.cargoroute.util.EnumFinder
+import org.example.cargoroute.util.ErrorMessages.COMPLETED_STATUS_SET_NOT_VISITED_POINTS_YET_ERROR
+import org.example.cargoroute.util.ErrorMessages.NEW_STATUS_SET_ALREADY_VISITED_POINTS_ERROR
+import org.example.cargoroute.util.ErrorMessages.ROUTE_NOT_NEW_DELETE_ERROR
+import org.example.cargoroute.util.ErrorMessages.ROUTE_NOT_FOUND_ERROR
+import org.example.cargoroute.util.ErrorMessages.ROUTE_NOT_NEW_EDIT_ERROR
+import org.example.cargoroute.util.ErrorMessages.USER_NOT_BELONG_ADMIN_ERROR
+import org.example.cargoroute.util.ErrorMessages.USER_NOT_FOUND_ERROR
+import org.example.cargoroute.util.SecurityUtil.getCurrentUserId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.StringUtils
 
 @Service
 class RouteServiceImpl(
     private val coordinateRepository: CoordinateRepository,
     private val routeRepository: RouteRepository,
     private val entityManager: EntityManager,
-    private val keycloakService: KeycloakService
+    private val keycloakService: KeycloakService,
+    private val coreClient: CoreClient
 ) : RouteService {
 
     @Transactional
     override fun createRoute(route: CreateRouteRequest): GetRouteResponse {
-        if (route.assignedUsername != null) {
+        if (StringUtils.hasLength(route.assignedUsername)) {
             checkUserBelongToAdmin(route.assignedUsername)
         }
         val routeEntity = RouteEntity.Builder().apply {
             name = route.name
             description = route.description
             assignedUsername = route.assignedUsername
+            routeStatus = RouteStatus.NEW.name
+            adminUsername = keycloakService.getUsernameByUserId(getCurrentUserId())
         }.build()
         val savedRoute = routeRepository.save(routeEntity)
         val coordinates = coordinatesToEntity(route.coordinates, savedRoute.id!!)
@@ -42,62 +56,87 @@ class RouteServiceImpl(
 
     @Transactional
     override fun deleteRoute(routeId: Long) {
-        coordinateRepository.deleteByRouteId(routeId)
+        val routeEntity = routeRepository.findById(routeId)
+            .orElseThrow { ResourceNotFoundException(ROUTE_NOT_FOUND_ERROR.format(routeId)) }
+        require(RouteStatus.NEW.name == routeEntity.routeStatus) { ROUTE_NOT_NEW_DELETE_ERROR.format(routeId) }
+
+        coordinateRepository.removeByRouteId(routeId)
         entityManager.flush()
         routeRepository.deleteById(routeId)
     }
 
     override fun findById(routeId: Long): GetRouteResponse {
         val routeEntity = routeRepository.findById(routeId)
-        if (routeEntity.isEmpty) {
-            return GetRouteResponse()
-        }
-        return buildGetRouteResponse(coordinateRepository.findByRouteId(routeId), routeEntity.get())
+            .orElseThrow { ResourceNotFoundException(ROUTE_NOT_FOUND_ERROR.format(routeId)) }
+
+        return buildGetRouteResponse(coordinateRepository.findByRouteId(routeId), routeEntity)
     }
 
-    override fun findPaging(page: Int, size: Int): PaginationResponse {
-        val routeEntityPage = routeRepository.findAll(PageRequest.of(page, size))
-        return buildPaginationResponse(routeEntityPage)
-    }
-
-    override fun findPaging(page: Int, size: Int, userId: String): PaginationResponse {
-        val username = keycloakService.getUsernameByUserId(userId)
-        val routeEntityPage = routeRepository.findByAssignedUsername(username, PageRequest.of(page, size))
-        return buildPaginationResponse(routeEntityPage)
+    override fun findPagingWithFilter(
+        username: String?, routeStatus: String?,
+        pointsNumberFrom: Long?, pointsNumberTo: Long?, description: String?, routeName: String?
+    ): PaginationResponse {
+        val routeStatusEnum = EnumFinder.findByName(RouteStatus::class.java, routeStatus)
+        val routeItemPage = routeRepository.findWithFilter(
+            PageRequest.of(0, 5), //TODO сделать keyset пагинацию
+            username ?: "",
+            description ?: "",
+            routeStatusEnum?.name ?: RouteStatus.NEW.name,
+            pointsNumberFrom,
+            pointsNumberTo,
+            keycloakService.getUsernameByUserId(getCurrentUserId()),
+            routeName ?: ""
+        )
+        return buildPaginationResponse(routeItemPage)
     }
 
     @Transactional
     override fun updateRoute(routeId: Long, createRouteRequest: CreateRouteRequest): GetRouteResponse {
-        coordinateRepository.deleteByRouteId(routeId)
-        entityManager.flush()
-        if (createRouteRequest.assignedUsername != null) {
-            checkUserBelongToAdmin(createRouteRequest.assignedUsername)
-        }
-        val routeEntity = RouteEntity.Builder().apply {
-            id = routeId
-            name = createRouteRequest.name
-            description = createRouteRequest.description
-            assignedUsername = createRouteRequest.assignedUsername
-        }.build()
-        val updatedRouteEntity = routeRepository.save(routeEntity)
+        val routeEntity = routeRepository.findById(routeId)
+            .orElseThrow { ResourceNotFoundException(ROUTE_NOT_FOUND_ERROR.format(routeId)) }
+        require(RouteStatus.NEW.name == routeEntity.routeStatus) { ROUTE_NOT_NEW_EDIT_ERROR.format(routeId) }
 
+        coordinateRepository.removeByRouteId(routeId)
+        entityManager.flush()
+        val assignedUsername = if (StringUtils.hasLength(createRouteRequest.assignedUsername)) {
+            checkUserBelongToAdmin(createRouteRequest.assignedUsername)
+            createRouteRequest.assignedUsername
+        } else {
+            ""
+        }
+        routeRepository.updateRouteEntity(
+            routeId,
+            createRouteRequest.name,
+            createRouteRequest.description,
+            assignedUsername,
+            null
+        )
         val coordinates = coordinatesToEntity(createRouteRequest.coordinates, routeId)
-        return buildGetRouteResponse(coordinateRepository.saveAll(coordinates), updatedRouteEntity)
+        return buildGetRouteResponse(coordinateRepository.saveAll(coordinates), routeRepository.findById(routeId).get())
     }
 
+    @Transactional
     override fun markPoints(
         routeId: Long,
-        points: List<ApiV1RoutesMarkPointsRouteIdPutRequestInner>
+        markPointsRequest: MarkPointsRequest
     ): GetRouteResponse {
-        val coordinatesMap: Map<Long, CoordinateEntity> = coordinateRepository.findByRouteId(routeId).associateBy { it.id!! }
-        points.forEach { coordinatesMap[it.id]?.isVisited = it.isVisited }
+        val coordinatesMap: Map<Long, CoordinateEntity> =
+            coordinateRepository.findByRouteId(routeId).associateBy { it.id!! }
+        markPointsRequest.coordinates.forEach { coordinatesMap[it.id]?.isVisited = it.isVisited }
         coordinateRepository.saveAll(coordinatesMap.values)
+        updateRouteEntityStatus(routeId, markPointsRequest)
         return findById(routeId)
     }
 
-    private fun buildPaginationResponse(routeEntityPage: Page<RouteEntity>): PaginationResponse {
+    override fun isRouteExistByUser(userId: String): RouteExistResponse {
+        val username = keycloakService.getUsernameByUserId(userId)
+        val response = RouteExistResponse()
+        return response.isUserExist(routeRepository.existsByAssignedUsername(username))
+    }
+
+    private fun buildPaginationResponse(routeEntityPage: Page<RouteItemEntity>): PaginationResponse {
         return PaginationResponse().apply {
-            content = routeEntityPage.content.map { it.id }
+            content = routeItemToDto(routeEntityPage.content)
             totalPages = routeEntityPage.totalPages
             totalElements = routeEntityPage.totalElements.toInt()
             last = routeEntityPage.isLast
@@ -106,6 +145,19 @@ class RouteServiceImpl(
             numberOfElements = routeEntityPage.numberOfElements
             first = routeEntityPage.isFirst
             empty = routeEntityPage.isEmpty
+        }
+    }
+
+    private fun routeItemToDto(routeItemEntityList: List<RouteItemEntity>): List<RouteItem> {
+        return routeItemEntityList.map { routeItemEntity ->
+            RouteItem().apply {
+                id = routeItemEntity.id
+                name = routeItemEntity.name
+                description = routeItemEntity.description
+                assignedUsername = routeItemEntity.assignedUsername
+                routeStatus = RouteItem.RouteStatusEnum.fromValue(routeItemEntity.routeStatus.name)
+                pointsCount = routeItemEntity.pointsCount
+            }
         }
     }
 
@@ -118,7 +170,7 @@ class RouteServiceImpl(
         return GetRouteResponse().apply {
             this.id = sortedCoordinates.first().routeId
             this.coordinates = sortedCoordinates.map { coordinate ->
-                ApiV1RoutesMarkPointsRouteIdPutRequestInner().apply {
+                CoordinateItem().apply {
                     id = coordinate.id
                     latitude = coordinate.latitude.toFloat()
                     longitude = coordinate.longitude.toFloat()
@@ -128,32 +180,36 @@ class RouteServiceImpl(
             this.name = routeEntity.name
             this.description = routeEntity.description
             this.assignedUsername = routeEntity.assignedUsername
-        }
-    }
-
-    private fun coordinatesToEntity(
-        coordinates: List<CreateRouteRequestCoordinatesInner>,
-        routeId: Long
-    ): List<CoordinateEntity> {
-        return coordinates.mapIndexed { index, coordinate ->
-            CoordinateEntity.Builder().apply {
-                latitude = coordinate.latitude.toDouble()
-                longitude = coordinate.longitude.toDouble()
-                this.routeId = routeId
-                isVisited = false
-                order = index
-            }.build()
+            this.routeStatus = routeEntity.routeStatus
         }
     }
 
     private fun checkUserBelongToAdmin(username: String) {
+        val userId = keycloakService.getUserIdByUsername(username)
+            ?: throw ResourceNotFoundException(USER_NOT_FOUND_ERROR.format(username))
         val adminId = getCurrentUserId()
-        // TODO: Implement the logic to check if the user belongs to the admin
+
+        require(coreClient.isUserBelongToAdmin(userId, adminId)) {
+            USER_NOT_BELONG_ADMIN_ERROR.format(userId, adminId)
+        }
     }
 
-    private fun getCurrentUserId(): String {
-        val jwt = SecurityContextHolder.getContext().authentication.principal as Jwt
-        return jwt.claims["sub"] as? String
-            ?: throw IllegalArgumentException("Subject (sub) not found in JWT")
+    private fun updateRouteEntityStatus(routeId: Long, markPointsRequest: MarkPointsRequest) {
+        if (RouteStatus.COMPLETED.name == markPointsRequest.routeStatus) {
+            markPointsRequest.coordinates.forEach {
+                require(it.isVisited != false) { COMPLETED_STATUS_SET_NOT_VISITED_POINTS_YET_ERROR }
+            }
+        }
+        if (RouteStatus.NEW.name == markPointsRequest.routeStatus) {
+            markPointsRequest.coordinates.forEach {
+                require(it.isVisited != true) { NEW_STATUS_SET_ALREADY_VISITED_POINTS_ERROR }
+            }
+        }
+        val routeEntityOptional = routeRepository.findById(routeId)
+        if (routeEntityOptional.isPresent) {
+            val routeEntity = routeEntityOptional.get()
+            routeEntity.routeStatus = markPointsRequest.routeStatus
+            routeRepository.save(routeEntity)
+        }
     }
 }

@@ -21,16 +21,24 @@ class RouteEntity private constructor(
     val description: String,
 
     @Column(name = "assigned_username")
-    val assignedUsername: String? = null
+    val assignedUsername: String? = null,
+
+    @Column(name = "route_status")
+    var routeStatus: String,
+
+    @Column(name = "admin_username")
+    val adminUsername: String
 ) {
     data class Builder(
         var id: Long? = null,
         var name: String = "",
         var description: String = "",
-        var assignedUsername: String? = null
+        var assignedUsername: String? = null,
+        var routeStatus: String = RouteStatus.NEW.name,
+        var adminUsername: String = ""
     ) {
         fun build(): RouteEntity {
-            return RouteEntity(id, name, description, assignedUsername)
+            return RouteEntity(id, name, description, assignedUsername, routeStatus, adminUsername)
         }
     }
 

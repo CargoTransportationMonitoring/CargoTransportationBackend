@@ -86,10 +86,14 @@ class UserServiceImpl(
         logger.info("User with id: $userId was successfully unlinked")
     }
 
-    override fun generateCode(username: String, adminId: String): String {
+    override fun generateCode(username: String, adminId: String): CodeGeneratedResponse {
         val userId = keycloakService.tryGetUserIdByUsername(username)
-        require(userId != null) { throw ResourceNotFoundException(USER_NOT_FOUND_ERROR.format(username)) }
-        return linkTokenUtil.generateToken(userId, adminId, MINUTES_EXPIRATION)
+        require(userId != null) {
+            throw ResourceNotFoundException(USER_NOT_FOUND_ERROR.format(username))
+        }
+
+        val generatedCode = linkTokenUtil.generateToken(userId, adminId, MINUTES_EXPIRATION)
+        return CodeGeneratedResponse().code(generatedCode)
     }
 
     override fun getUsersByAdmin(adminId: String): List<GetUserResponse> {
@@ -107,8 +111,9 @@ class UserServiceImpl(
         return getUserDetailsResponse
     }
 
-    override fun checkUserBelongAdmin(userId: String, adminId: String): Boolean {
-        return userAdminRepository.findByAdminIdAndUserId(adminId, userId) != null
+    override fun checkUserBelongAdmin(userId: String, adminId: String): CheckAdminResponse {
+        val isUserBelongAdmin = userAdminRepository.findByAdminIdAndUserId(adminId, userId) != null
+        return CheckAdminResponse().isUserBelongAdmin(isUserBelongAdmin)
     }
 
     private fun tryGetAdminUsernameByUserId(userId: String): String? {

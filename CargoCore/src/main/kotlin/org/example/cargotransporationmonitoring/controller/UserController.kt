@@ -49,7 +49,7 @@ class UserController(
     }
 
     @PreAuthorize("hasRole('admin')")
-    override fun apiV1CheckAdminMembershipGet(userId: String, adminId: String): ResponseEntity<Boolean> {
+    override fun apiV1CheckAdminMembershipGet(userId: String, adminId: String): ResponseEntity<CheckAdminResponse> {
         return ResponseEntity.ok().body(userService.checkUserBelongAdmin(userId, adminId))
     }
 
@@ -66,7 +66,7 @@ class UserController(
     }
 
     @PreAuthorize("hasRole('admin')")
-    override fun apiV1UserGenerateCodeGet(username: String): ResponseEntity<String> {
+    override fun apiV1UserGenerateCodeGet(username: String): ResponseEntity<CodeGeneratedResponse> {
         val adminId = getCurrentUserId()
         return ResponseEntity.ok().body(userService.generateCode(username, adminId))
     }

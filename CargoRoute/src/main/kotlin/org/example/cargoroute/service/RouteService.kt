@@ -1,9 +1,10 @@
 package org.example.cargoroute.service
 
-import com.example.model.route.ApiV1RoutesMarkPointsRouteIdPutRequestInner
 import com.example.model.route.CreateRouteRequest
 import com.example.model.route.GetRouteResponse
+import com.example.model.route.MarkPointsRequest
 import com.example.model.route.PaginationResponse
+import com.example.model.route.RouteExistResponse
 
 interface RouteService {
 
@@ -13,24 +14,9 @@ interface RouteService {
     fun createRoute(route: CreateRouteRequest): GetRouteResponse
 
     /**
-     * Delete a route
-     */
-    fun deleteRoute(routeId: Long)
-
-    /**
      * Find a route by id
      */
     fun findById(routeId: Long): GetRouteResponse
-
-    /**
-     * Find all routes
-     */
-    fun findPaging(page: Int, size: Int): PaginationResponse
-
-    /**
-     * Find all routes by user
-     */
-    fun findPaging(page: Int, size: Int, userId: String): PaginationResponse
 
     /**
      * Update Route
@@ -38,7 +24,23 @@ interface RouteService {
     fun updateRoute(routeId: Long, createRouteRequest: CreateRouteRequest): GetRouteResponse
 
     /**
+     * Delete a route
+     */
+    fun deleteRoute(routeId: Long)
+
+    /**
+     * Find all routes
+     */
+    fun findPagingWithFilter(username: String?, routeStatus: String?, pointsNumberFrom: Long?,
+                             pointsNumberTo: Long?, description: String?, routeName: String?): PaginationResponse
+
+    /**
      * Change points state
      */
-    fun markPoints(routeId: Long, points: List<ApiV1RoutesMarkPointsRouteIdPutRequestInner>): GetRouteResponse
+    fun markPoints(routeId: Long, markPointsRequest: MarkPointsRequest): GetRouteResponse
+
+    /**
+     * Check if user has routes
+     */
+    fun isRouteExistByUser(userId: String): RouteExistResponse
 }

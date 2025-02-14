@@ -1,0 +1,35 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1" author="ndivanov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="route" columnName="route_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="route">
+            <column name="route_status" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2" author="ndivanov">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="route"/>
+                <not>
+                    <columnExists tableName="route" columnName="admin_username"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="route">
+            <column name="admin_username" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

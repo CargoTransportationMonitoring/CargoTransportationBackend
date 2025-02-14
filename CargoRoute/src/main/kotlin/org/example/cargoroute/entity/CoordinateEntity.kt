@@ -13,7 +13,7 @@ class CoordinateEntity private constructor(
         sequenceName = "coordinate_seq",
         allocationSize = 1
     )
-    val id: Long?,
+    var id: Long?,
 
     @Column(name = "latitude")
     val latitude: Double,

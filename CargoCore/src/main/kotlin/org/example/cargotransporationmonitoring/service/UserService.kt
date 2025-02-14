@@ -1,10 +1,6 @@
 package org.example.cargotransporationmonitoring.service
 
-import com.example.model.users.GetUserDetailsResponse
-import com.example.model.users.GetUserResponse
-import com.example.model.users.LinkUserRequest
-import com.example.model.users.RegisterUserRequest
-import com.example.model.users.UpdateUserRequest
+import com.example.model.users.*
 
 interface UserService {
 
@@ -41,7 +37,7 @@ interface UserService {
     /**
      * Generate personal code for link
      */
-    fun generateCode(username: String, adminId: String): String
+    fun generateCode(username: String, adminId: String): CodeGeneratedResponse
 
     /**
      * Get all users by adminId
@@ -56,5 +52,5 @@ interface UserService {
     /**
      * Check user belong admin
      */
-    fun checkUserBelongAdmin(userId: String, adminId: String): Boolean
+    fun checkUserBelongAdmin(userId: String, adminId: String): CheckAdminResponse
 }

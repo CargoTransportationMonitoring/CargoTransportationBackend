@@ -8,9 +8,12 @@ tags:
     description: Route API
 
 paths:
-  /api/v1/routes:
+  /api/v1/route:
     post:
       summary: Создать новый маршрут
+      security:
+        - BearerAuth: [ ]
+      description: Создает новый маршрут
       requestBody:
         required: true
         content:
@@ -39,38 +42,11 @@ paths:
       tags:
         - Route
 
-    get:
-      summary: Получить список маршрутов
-      description: Возвращает список маршрутов с поддержкой пагинации.
-      parameters:
-        - name: page
-          in: query
-          description: Номер страницы, начиная с 0.
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-        - name: size
-          in: query
-          description: Количество элементов на странице.
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 20
-      responses:
-        '200':
-          description: Успешный ответ
-          content:
-            application/json:
-              schema:
-                type: object
-                $ref: '#/components/schemas/PaginationResponse'
-
-  /api/v1/routes/{routeId}:
+  /api/v1/route/{routeId}:
     get:
       summary: Получить информацию о маршруте
+      security:
+        - BearerAuth: [ ]
       parameters:
         - name: routeId
           in: path
@@ -96,6 +72,8 @@ paths:
 
     put:
       summary: Обновить маршрут
+      security:
+        - BearerAuth: [ ]
       parameters:
         - name: routeId
           in: path
@@ -127,6 +105,8 @@ paths:
 
     delete:
       summary: Удалить маршрут
+      security:
+        - BearerAuth: [ ]
       parameters:
         - name: routeId
           in: path
@@ -144,9 +124,100 @@ paths:
       tags:
         - Route
 
-  /api/v1/routes/markPoints/{routeId}:
+  /api/v1/routes:
+    get:
+      summary: Получить список маршрутов
+      security:
+        - BearerAuth: [ ]
+      description: Возвращает список маршрутов с поддержкой пагинации.
+      parameters:
+        - name: username
+          in: query
+          description: Фильтрация маршрутов по имени пользователя.
+          required: false
+          schema:
+            type: string
+        - name: routeStatus
+          in: query
+          description: Фильтрация маршрутов по статусу.
+          required: false
+          schema:
+            type: string
+            enum:
+              - NEW
+              - IN_PROGRESS
+              - COMPLETED
+            default: NEW
+        - name: pointsNumberFrom
+          in: query
+          description: Фильтрация маршрутов по минимальному количеству точек в нем
+          required: false
+          schema:
+            type: long
+        - name: pointsNumberTo
+          in: query
+          description: Фильтрация маршрутов по максимальному количеству точек в нем
+          required: false
+          schema:
+            type: long
+        - name: description
+          in: query
+          description: Фильтрация маршрутов по описанию.
+          required: false
+          schema:
+            type: string
+        - name: routeName
+          in: query
+          description: Наименование маршрута
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/PaginationResponse'
+        '400':
+          description: Ошибка валидации данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Route
+
+  /api/v1/user/{userId}/routes-exist:
+    get:
+      summary: Получить информацию о наличии маршрутов у пользователя
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор пользователя
+      responses:
+        '200':
+          description: Есть ли у пользователя маршруты
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteExistResponse'
+        '404':
+          description: Пользователь не найден
+      tags:
+        - Route
+
+  /api/v1/route/{routeId}/mark-points:
     put:
-      summary: Пометить точку маршрута как посещенную
+      summary: Пометить точки маршрута как посещенную
+      security:
+        - BearerAuth: [ ]
       parameters:
         - name: routeId
           in: path
@@ -159,21 +230,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  latitude:
-                    type: number
-                    format: float
-                  longitude:
-                    type: number
-                    format: float
-                  isVisited:
-                    type: boolean
-                  id:
-                    type: long
-              description: Массив координат маршрута
+              $ref: "#/components/schemas/MarkPointsRequest"
       responses:
         '200':
           description: Успешное выполнение
@@ -186,8 +243,10 @@ paths:
           description: Ошибка запроса
         '404':
           description: Маршрут не найден
+      tags:
+        - Route
 
-  /api/v1/routes/user/{userId}:
+  /api/v1/user/{userId}/routes:
     get:
       summary: Получить список маршрутов пользователя
       parameters:
@@ -197,22 +256,41 @@ paths:
           schema:
             type: string
           description: Id пользователя
-        - name: page
+        - name: routeStatus
           in: query
-          description: Номер страницы, начиная с 0.
+          description: Фильтр по статусу маршрута.
           required: false
           schema:
-            type: integer
-            minimum: 0
-            default: 0
-        - name: size
+            type: string
+            enum:
+              - NEW
+              - IN_PROGRESS
+              - COMPLETED
+            default: NEW
+        - name: pointsNumberFrom
           in: query
-          description: Количество элементов на странице.
+          description: Фильтрация маршрутов по минимальному количеству точек в нем
           required: false
           schema:
-            type: integer
-            minimum: 1
-            default: 20
+            type: long
+        - name: pointsNumberTo
+          in: query
+          description: Фильтрация маршрутов по максимальному количеству точек в нем
+          required: false
+          schema:
+            type: long
+        - name: description
+          in: query
+          description: Фильтрация маршрутов по описанию.
+          required: false
+          schema:
+            type: string
+        - name: routeName
+          in: query
+          description: Наименование маршрута
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Успешный ответ
@@ -232,6 +310,13 @@ paths:
 
 
 components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     PaginationResponse:
       type: object
@@ -240,7 +325,7 @@ components:
           type: array
           items:
             type: long
-            description: Список идентификаторов маршрутов.
+            $ref: '#/components/schemas/RouteItem'
         totalPages:
           type: integer
           description: Общее количество страниц.
@@ -267,6 +352,7 @@ components:
         empty:
           type: boolean
           description: Признак пустой страницы.
+
     CreateRouteRequest:
       type: object
       properties:
@@ -285,17 +371,11 @@ components:
         coordinates:
           type: array
           items:
-            type: object
-            properties:
-              latitude:
-                type: number
-                format: float
-              longitude:
-                type: number
-                format: float
+            $ref: '#/components/schemas/CoordinateItem'
           description: Массив координат маршрута
       required:
         - coordinates
+
     GetRouteResponse:
       type: object
       properties:
@@ -311,28 +391,95 @@ components:
         assignedUsername:
           type: string
           description: Имя пользователя на которого назначен маршрут
+        routeStatus:
+          type: string
+          description: Статус маршрута
         coordinates:
           type: array
           items:
-            type: object
-            properties:
-              latitude:
-                type: number
-                format: float
-              longitude:
-                type: number
-                format: float
-              isVisited:
-                type: boolean
-              id:
-                type: long
+            $ref: '#/components/schemas/CoordinateItem'
           description: Массив координат маршрута
       required:
         - id
         - coordinates
+
+    RouteExistResponse:
+      type: object
+      properties:
+        isUserExist:
+          type: boolean
+
+    MarkPointsRequest:
+      type: object
+      properties:
+        routeStatus:
+          type: string
+          description: Статус маршрута
+        coordinates:
+          type: array
+          description: Массив координат маршрута
+          items:
+            $ref: '#/components/schemas/CoordinateItem'
+
+    RouteItem:
+      type: object
+      properties:
+        id:
+          type: long
+          description: Идентификатор маршрута.
+        name:
+          type: string
+          description: Название маршрута.
+        description:
+          type: string
+          description: Описание маршрута.
+        assignedUsername:
+          type: string
+          description: Имя пользователя, назначенного на маршрут.
+        routeStatus:
+          type: string
+          enum: [ NEW, IN_PROGRESS, COMPLETED ]
+          description: Статус маршрута.
+        pointsCount:
+          type: integer
+          description: Количество точек маршрута.
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата и время создания маршрута.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Дата и время последнего обновления маршрута.
+
+    CoordinateItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор точки маршрута
+        latitude:
+          type: number
+          format: float
+          description: Широта
+        longitude:
+          type: number
+          format: float
+          description: Долгота
+        isVisited:
+          type: boolean
+          description: Флаг посещения точки маршрута
+
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
           description: Описание ошибки
+        status:
+          type: string
+          description: Статус ошибки
+
+security:
+  - bearerAuth: [ ]

@@ -27,7 +27,8 @@ client:
   url: http://localhost:3000
 
 core:
-  url: http://localhost:8081
+  service:
+    url: http://localhost:8081
 
 
 keycloak:

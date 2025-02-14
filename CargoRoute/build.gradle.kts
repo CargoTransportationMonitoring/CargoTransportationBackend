@@ -4,7 +4,6 @@ plugins {
     id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.openapi.generator") version "7.9.0"
-//    id("org.jetbrains.kotlin.kapt") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
 }
 
