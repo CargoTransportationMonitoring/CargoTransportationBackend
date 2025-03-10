@@ -3,7 +3,7 @@ package org.example.cargotransporationmonitoring.controller
 import com.example.api.users.UserApi
 import com.example.model.users.*
 import org.example.cargotransporationmonitoring.service.UserService
-import org.example.cargotransporationmonitoring.util.SecurityUtils.getCurrentUserId
+import org.example.cargocommon.util.SecurityUtils.getCurrentUserId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

@@ -391,5 +391,11 @@ components:
           type: string
           description: Статус ошибки
 
+    RouteExistResponse:
+      type: object
+      properties:
+        isUserExist:
+          type: boolean
+
 security:
   - bearerAuth: [ ]

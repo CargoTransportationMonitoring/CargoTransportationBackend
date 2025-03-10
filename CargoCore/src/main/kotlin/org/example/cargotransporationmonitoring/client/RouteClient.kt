@@ -1,5 +1,6 @@
 package org.example.cargotransporationmonitoring.client
 
+import com.example.model.users.RouteExistResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -10,6 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable
 )
 interface RouteClient {
 
-    @GetMapping("/api/v1/routesByUser/{userId}")
-    fun isExistByUserId(@PathVariable("userId") userId: String): Boolean
+    @GetMapping("/api/v1/user/{userId}/routes-exist")
+    fun isExistByUserId(@PathVariable("userId") userId: String): RouteExistResponse
 }

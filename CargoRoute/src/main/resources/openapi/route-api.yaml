@@ -481,5 +481,12 @@ components:
           type: string
           description: Статус ошибки
 
+    CheckAdminResponse:
+      type: object
+      properties:
+        isUserBelongAdmin:
+          type: boolean
+          description: флаг отвечающий за принадлежность пользователя к администратору
+
 security:
   - bearerAuth: [ ]

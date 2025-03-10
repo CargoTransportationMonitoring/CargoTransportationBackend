@@ -17,6 +17,7 @@ java {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -53,22 +54,17 @@ val openApiRouteApiTask = "openApiRouteApi"
 extra["springCloudVersion"] = "2023.0.4"
 
 dependencies {
+    implementation(project(":CargoCommon"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion")
     implementation("org.openapitools:jackson-databind-nullable:$jacksonDatabindNullable")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("org.liquibase:liquibase-core:$liquibaseVersion")
-    implementation("org.mapstruct:mapstruct:$mapstructVersion")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-    implementation("org.keycloak:keycloak-admin-client:$keyCloakAdminVersion")
+
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 
     // Test dependencies
@@ -81,7 +77,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$junit5Version")
     testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitLauncherVersion")
-
 }
 
 dependencyManagement {

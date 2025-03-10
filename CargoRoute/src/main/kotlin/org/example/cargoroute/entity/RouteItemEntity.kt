@@ -1,6 +1,6 @@
 package org.example.cargoroute.entity
 
-import org.example.cargoroute.util.EnumFinder
+import org.example.cargocommon.util.EnumFinder
 
 class RouteItemEntity(
     val id: Long,

@@ -6,7 +6,7 @@ import com.example.model.route.GetRouteResponse
 import com.example.model.route.MarkPointsRequest
 import com.example.model.route.PaginationResponse
 import com.example.model.route.RouteExistResponse
-import org.example.cargoroute.keycloak.KeycloakService
+import org.example.cargocommon.security.keycloak.KeycloakService
 import org.example.cargoroute.service.RouteService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -17,18 +17,17 @@ java {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 // dependency versions
 val postgresVersion = "42.7.2"
 val r2dbcVersion = "1.0.5.RELEASE"
-val liquibaseVersion = "4.29.2"
 val junit5Version = "2.0.20"
 val junitLauncherVersion = "1.11.0"
 val openApiStarterVersion = "2.6.0"
 val jacksonDatabindNullable = "0.2.6"
-val mapstructVersion = "1.5.5.Final"
 val testContainersVersion = "1.20.1"
 val keyCloakAdminVersion = "25.0.6"
 
@@ -54,21 +53,17 @@ val openApiCargoApiTask = "openApiCargoApi"
 extra["springCloudVersion"] = "2023.0.4"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation(project(":CargoCommon"))
+    implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion")
     implementation("org.openapitools:jackson-databind-nullable:$jacksonDatabindNullable")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("org.liquibase:liquibase-core:$liquibaseVersion")
-    implementation("org.mapstruct:mapstruct:$mapstructVersion")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-    implementation("org.keycloak:keycloak-admin-client:$keyCloakAdminVersion")
+
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 
     // Test dependencies
@@ -81,7 +76,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$junit5Version")
     testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitLauncherVersion")
-
 }
 
 dependencyManagement {

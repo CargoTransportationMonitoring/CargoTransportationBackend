@@ -2,18 +2,19 @@ package org.example.cargoroute.service.impl
 
 import com.example.model.route.*
 import jakarta.persistence.EntityManager
+import org.example.cargocommon.exception.ResourceNotFoundException
+import org.example.cargocommon.security.keycloak.KeycloakService
+import org.example.cargocommon.util.EnumFinder
+import org.example.cargocommon.util.SecurityUtils.getCurrentUserId
 import org.example.cargoroute.client.CoreClient
 import org.example.cargoroute.entity.CoordinateEntity
 import org.example.cargoroute.entity.RouteEntity
 import org.example.cargoroute.entity.RouteItemEntity
 import org.example.cargoroute.entity.RouteStatus
-import org.example.cargoroute.exception.ResourceNotFoundException
-import org.example.cargoroute.keycloak.KeycloakService
 import org.example.cargoroute.mapper.CoordinatesMapper.coordinatesToEntity
 import org.example.cargoroute.repository.CoordinateRepository
 import org.example.cargoroute.repository.RouteRepository
 import org.example.cargoroute.service.RouteService
-import org.example.cargoroute.util.EnumFinder
 import org.example.cargoroute.util.ErrorMessages.COMPLETED_STATUS_SET_NOT_VISITED_POINTS_YET_ERROR
 import org.example.cargoroute.util.ErrorMessages.NEW_STATUS_SET_ALREADY_VISITED_POINTS_ERROR
 import org.example.cargoroute.util.ErrorMessages.ROUTE_NOT_NEW_DELETE_ERROR
@@ -21,7 +22,6 @@ import org.example.cargoroute.util.ErrorMessages.ROUTE_NOT_FOUND_ERROR
 import org.example.cargoroute.util.ErrorMessages.ROUTE_NOT_NEW_EDIT_ERROR
 import org.example.cargoroute.util.ErrorMessages.USER_NOT_BELONG_ADMIN_ERROR
 import org.example.cargoroute.util.ErrorMessages.USER_NOT_FOUND_ERROR
-import org.example.cargoroute.util.SecurityUtil.getCurrentUserId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -77,6 +77,7 @@ class RouteServiceImpl(
         pointsNumberFrom: Long?, pointsNumberTo: Long?, description: String?, routeName: String?
     ): PaginationResponse {
         val routeStatusEnum = EnumFinder.findByName(RouteStatus::class.java, routeStatus)
+        val currentUsername = keycloakService.getUsernameByUserId(getCurrentUserId())
         val routeItemPage = routeRepository.findWithFilter(
             PageRequest.of(0, 5), //TODO сделать keyset пагинацию
             username ?: "",
@@ -84,7 +85,7 @@ class RouteServiceImpl(
             routeStatusEnum?.name ?: RouteStatus.NEW.name,
             pointsNumberFrom,
             pointsNumberTo,
-            keycloakService.getUsernameByUserId(getCurrentUserId()),
+            if (currentUsername == username) "" else currentUsername,
             routeName ?: ""
         )
         return buildPaginationResponse(routeItemPage)
@@ -189,7 +190,7 @@ class RouteServiceImpl(
             ?: throw ResourceNotFoundException(USER_NOT_FOUND_ERROR.format(username))
         val adminId = getCurrentUserId()
 
-        require(coreClient.isUserBelongToAdmin(userId, adminId)) {
+        require(coreClient.isUserBelongToAdmin(userId, adminId).isUserBelongAdmin) {
             USER_NOT_BELONG_ADMIN_ERROR.format(userId, adminId)
         }
     }

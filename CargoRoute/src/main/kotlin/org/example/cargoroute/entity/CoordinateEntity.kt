@@ -2,7 +2,6 @@ package org.example.cargoroute.entity
 
 import jakarta.persistence.*
 
-
 @Entity
 @Table(name = "coordinate")
 class CoordinateEntity private constructor(

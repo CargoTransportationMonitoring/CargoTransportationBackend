@@ -1,13 +1,13 @@
 package org.example.cargotransporationmonitoring.service.impl
 
 import com.example.model.users.*
+import org.example.cargocommon.dto.CommonRoles
 import org.example.cargotransporationmonitoring.client.RouteClient
-import org.example.cargotransporationmonitoring.entity.Roles
 import org.example.cargotransporationmonitoring.exception.LinkCodeInvalidException
-import org.example.cargotransporationmonitoring.exception.ResourceAlreadyExistException
-import org.example.cargotransporationmonitoring.exception.ResourceNotFoundException
+import org.example.cargocommon.exception.ResourceAlreadyExistException
+import org.example.cargocommon.exception.ResourceNotFoundException
 import org.example.cargotransporationmonitoring.exception.UserHasRoutesException
-import org.example.cargotransporationmonitoring.security.keycloak.KeycloakService
+import org.example.cargocommon.security.keycloak.KeycloakService
 import org.example.cargotransporationmonitoring.repository.UserAdminRepository
 import org.example.cargotransporationmonitoring.service.UserService
 import org.example.cargotransporationmonitoring.util.ErrorMessages.LINK_CODE_CONTAINS_NOT_VALID_USERNAME
@@ -15,6 +15,8 @@ import org.example.cargotransporationmonitoring.util.ErrorMessages.USER_ALREADY_
 import org.example.cargotransporationmonitoring.util.ErrorMessages.USER_HAS_ROUTES_ERROR
 import org.example.cargotransporationmonitoring.util.ErrorMessages.USER_NOT_FOUND_ERROR
 import org.example.cargotransporationmonitoring.util.LinkTokenUtil
+import org.example.cargotransporationmonitoring.util.toCommonRegisterUserRequest
+import org.example.cargotransporationmonitoring.util.toCommonUpdateUserRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -33,8 +35,8 @@ class UserServiceImpl(
     }
 
     override fun registerUser(registerUserRequest: RegisterUserRequest): GetUserResponse {
-        val userId = keycloakService.createKeyCloakUser(registerUserRequest)
-        keycloakService.addRolesToUser(userId, listOf(Roles.USER))
+        val userId = keycloakService.createKeyCloakUser(toCommonRegisterUserRequest(registerUserRequest))
+        keycloakService.addRolesToUser(userId, listOf(CommonRoles.USER))
 
         logger.info("User with email ${registerUserRequest.email} has been successfully created")
         return GetUserResponse()
@@ -52,12 +54,12 @@ class UserServiceImpl(
     }
 
     override fun updateUser(userId: String, updateUserRequest: UpdateUserRequest): GetUserResponse {
-        keycloakService.updateKeyCloakUser(userId, updateUserRequest)
+        keycloakService.updateKeyCloakUser(userId, toCommonUpdateUserRequest(updateUserRequest))
         return getUser(userId)
     }
 
     override fun deleteUser(userId: String) {
-        require(!routeClient.isExistByUserId(userId)) {
+        require(!routeClient.isExistByUserId(userId).isUserExist) {
             throw UserHasRoutesException(USER_HAS_ROUTES_ERROR.format(userId))
         }
         keycloakService.deleteKeyCloakUserById(userId)
@@ -79,7 +81,7 @@ class UserServiceImpl(
     }
 
     override fun unlinkUser(userId: String) {
-        require(!routeClient.isExistByUserId(userId)) {
+        require(!routeClient.isExistByUserId(userId).isUserExist) {
             throw UserHasRoutesException(USER_HAS_ROUTES_ERROR.format(userId))
         }
         userAdminRepository.deleteByUserId(userId)
