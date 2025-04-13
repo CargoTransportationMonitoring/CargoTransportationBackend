@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 class KCRoleConverter : Converter<Jwt, Collection<GrantedAuthority>> {
 
     companion object {
-        private const val RESOURCE_ACCESS = "resource_access"
+        private const val RESOURCE_ACCESS = "realm_access"
         private const val CLIENT_ACCESS = "cargotransportation-client"
         private const val ROLES = "roles"
     }

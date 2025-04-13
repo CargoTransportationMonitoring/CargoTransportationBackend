@@ -12,7 +12,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8080/realms/cargotransportation-realm/protocol/openid-connect/certs
+          jwk-set-uri: http://localhost:8081/realms/cargotransportation-realm/protocol/openid-connect/certs
 server:
   port: 8082
 
@@ -28,14 +28,14 @@ client:
 
 core:
   service:
-    url: http://localhost:8081
+    url: http://localhost:8083
 
 
 keycloak:
-  auth-server-url: http://localhost:8080
+  auth-server-url: http://localhost:8081
   resource: user-manage-client
   realm: cargotransportation-realm
   use-resource-role-mappings: true
   ssl-required: external
   credentials:
-    secret: oUz5y5x5A9Z6PChPadWEm55X2socNNQR
+    secret: i4OU48rv7gIsXkp5303iIvSCrYGbeM5F

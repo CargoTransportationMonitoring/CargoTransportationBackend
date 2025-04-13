@@ -23,7 +23,7 @@ class UserController(
         return ResponseEntity.ok(userService.getUser(userId))
     }
 
-    @PreAuthorize("hasRole('user') and #userId == authentication.name")
+    @PreAuthorize("#userId == authentication.name")
     override fun apiV1UserUserIdPut(
         userId: String,
         updateUserRequest: UpdateUserRequest
