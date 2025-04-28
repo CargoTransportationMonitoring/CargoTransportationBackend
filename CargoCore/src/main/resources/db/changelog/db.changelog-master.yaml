@@ -8,3 +8,12 @@ databaseChangeLog:
             encoding: UTF-8
             splitStatements: true
             stripComments: true
+  - changeSet:
+      id: 2
+      author: ndivanov
+      changes:
+        - sqlFile:
+            path: db/changelog/V2_user_attributes.sql
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: true

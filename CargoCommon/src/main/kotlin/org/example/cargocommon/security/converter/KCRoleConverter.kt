@@ -8,15 +8,13 @@ import org.springframework.security.oauth2.jwt.Jwt
 class KCRoleConverter : Converter<Jwt, Collection<GrantedAuthority>> {
 
     companion object {
-        private const val RESOURCE_ACCESS = "realm_access"
-        private const val CLIENT_ACCESS = "cargotransportation-client"
+        private const val REALM_ACCESS = "realm_access"
         private const val ROLES = "roles"
     }
 
     override fun convert(jwt: Jwt): Collection<GrantedAuthority> {
-        val resourceAccess = jwt.claims[RESOURCE_ACCESS] as? Map<*, *> ?: return emptyList()
-        val clientAccess = resourceAccess[CLIENT_ACCESS] as? Map<*, *> ?: return emptyList()
-        val roles = clientAccess[ROLES] as? List<*> ?: return emptyList()
+        val resourceAccess = jwt.claims[REALM_ACCESS] as? Map<*, *> ?: return emptyList()
+        val roles = resourceAccess[ROLES] as? List<*> ?: return emptyList()
 
         return roles
             .filterIsInstance<String>()

@@ -24,7 +24,6 @@ class RouteController(
         return ResponseEntity.status(HttpStatus.CREATED).body(routeService.createRoute(createRouteRequest))
     }
 
-    @PreAuthorize("hasAnyRole('admin', 'user')")
     override fun apiV1RouteRouteIdGet(routeId: Long): ResponseEntity<GetRouteResponse> {
         routeService.findById(routeId).let {
             return ResponseEntity.ok().body(it)
@@ -76,7 +75,7 @@ class RouteController(
         }
     }
 
-    @PreAuthorize("hasRole('user')")
+    @PreAuthorize("not hasRole('admin')")
     override fun apiV1RouteRouteIdMarkPointsPut(
         routeId: Long,
         markPointsRequest: MarkPointsRequest
@@ -84,7 +83,6 @@ class RouteController(
         return ResponseEntity.ok().body(routeService.markPoints(routeId, markPointsRequest))
     }
 
-    @PreAuthorize("hasAnyRole('user', 'admin')")
     override fun apiV1UserUserIdRoutesExistGet(userId: String): ResponseEntity<RouteExistResponse> {
         return ResponseEntity.ok().body(routeService.isRouteExistByUser(userId))
     }

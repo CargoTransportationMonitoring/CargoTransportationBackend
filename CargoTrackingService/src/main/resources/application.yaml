@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: CargoTrackingService
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/realms/cargotransportation-realm/protocol/openid-connect/certs
+  data:
+    redis:
+      host: localhost
+      port: 6379
+server:
+  port: 8084
+

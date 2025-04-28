@@ -31,7 +31,7 @@ class UserController(
         return ResponseEntity.ok(userService.updateUser(userId, updateUserRequest))
     }
 
-    @PreAuthorize("hasRole('user') and #userId == authentication.name")
+    @PreAuthorize("not hasRole('admin') and #userId == authentication.name")
     override fun apiV1UserUserIdDelete(userId: String): ResponseEntity<Void> {
         userService.deleteUser(userId)
         return ResponseEntity.noContent().build()
@@ -53,13 +53,13 @@ class UserController(
         return ResponseEntity.ok().body(userService.checkUserBelongAdmin(userId, adminId))
     }
 
-    @PreAuthorize("hasRole('user') and #userId == authentication.name")
+    @PreAuthorize("not hasRole('admin') and #userId == authentication.name")
     override fun apiV1UserUserIdLinkPut(userId: String, linkUserRequest: LinkUserRequest): ResponseEntity<Void> {
         userService.linkUser(userId, linkUserRequest)
         return ResponseEntity.ok().build()
     }
 
-    @PreAuthorize("hasRole('user') and #userId == authentication.name")
+    @PreAuthorize("not hasRole('admin') and #userId == authentication.name")
     override fun apiV1UserUserIdUnlinkPut(userId: String): ResponseEntity<Void> {
         userService.unlinkUser(userId)
         return ResponseEntity.ok().build()
