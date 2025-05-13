@@ -2,8 +2,8 @@ package org.example.cargotransporationmonitoring.controller
 
 import com.example.api.users.UserApi
 import com.example.model.users.*
+import org.example.cargocommon.util.SecurityUtils
 import org.example.cargotransporationmonitoring.service.UserService
-import org.example.cargocommon.util.SecurityUtils.getCurrentUserId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val securityUtils: SecurityUtils
 ) : UserApi {
 
     override fun apiV1UserPost(registerUserRequest: RegisterUserRequest): ResponseEntity<GetUserResponse> {
@@ -39,7 +40,7 @@ class UserController(
 
     @PreAuthorize("hasRole('admin')")
     override fun apiV1UsersGet(): ResponseEntity<List<GetUserResponse>> {
-        val adminId = getCurrentUserId()
+        val adminId = securityUtils.getCurrentUserId()
         return ResponseEntity.ok().body(userService.getUsersByAdmin(adminId))
     }
 
@@ -67,7 +68,7 @@ class UserController(
 
     @PreAuthorize("hasRole('admin')")
     override fun apiV1UserGenerateCodeGet(username: String): ResponseEntity<CodeGeneratedResponse> {
-        val adminId = getCurrentUserId()
+        val adminId = securityUtils.getCurrentUserId()
         return ResponseEntity.ok().body(userService.generateCode(username, adminId))
     }
 }

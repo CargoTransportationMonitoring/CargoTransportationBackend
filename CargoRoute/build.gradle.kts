@@ -32,6 +32,7 @@ val jacksonDatabindNullable = "0.2.6"
 val mapstructVersion = "1.5.5.Final"
 val testContainersVersion = "1.20.1"
 val keyCloakAdminVersion = "25.0.6"
+val mockitoVersion = "5.2.1"
 
 // openApi
 val openApiSpecDir = "$rootDir/CargoRoute/src/main/resources/openapi"
@@ -71,10 +72,13 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$junit5Version")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitLauncherVersion")
 }

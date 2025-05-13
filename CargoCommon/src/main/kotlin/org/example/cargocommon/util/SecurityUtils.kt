@@ -4,10 +4,14 @@ import ErrorMessages.JWT_TOKEN_NOT_FOUND
 import ErrorMessages.SUBJECT_NOT_FOUND_IN_JWT
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.stereotype.Component
 
-object SecurityUtils {
+@Component
+class SecurityUtils {
 
-    private const val SUB_CLAIM = "sub"
+    companion object {
+        private const val SUB_CLAIM = "sub"
+    }
 
     fun getCurrentUserId(): String {
         val authentication = SecurityContextHolder.getContext().authentication

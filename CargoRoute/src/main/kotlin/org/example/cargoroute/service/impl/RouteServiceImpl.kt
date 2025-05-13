@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManager
 import org.example.cargocommon.exception.ResourceNotFoundException
 import org.example.cargocommon.security.keycloak.KeycloakService
 import org.example.cargocommon.util.EnumFinder
-import org.example.cargocommon.util.SecurityUtils.getCurrentUserId
+import org.example.cargocommon.util.SecurityUtils
 import org.example.cargoroute.client.CoreClient
 import org.example.cargoroute.entity.CoordinateEntity
 import org.example.cargoroute.entity.RouteEntity
@@ -34,7 +34,8 @@ class RouteServiceImpl(
     private val routeRepository: RouteRepository,
     private val entityManager: EntityManager,
     private val keycloakService: KeycloakService,
-    private val coreClient: CoreClient
+    private val coreClient: CoreClient,
+    private val securityUtils: SecurityUtils
 ) : RouteService {
 
     @Transactional
@@ -47,7 +48,7 @@ class RouteServiceImpl(
             description = route.description
             assignedUsername = route.assignedUsername
             routeStatus = RouteStatus.NEW.name
-            adminUsername = keycloakService.getUsernameByUserId(getCurrentUserId())
+            adminUsername = keycloakService.getUsernameByUserId(securityUtils.getCurrentUserId())
         }.build()
         val savedRoute = routeRepository.save(routeEntity)
         val coordinates = coordinatesToEntity(route.coordinates, savedRoute.id!!)
@@ -77,7 +78,7 @@ class RouteServiceImpl(
         pointsNumberFrom: Long?, pointsNumberTo: Long?, description: String?, routeName: String?
     ): PaginationResponse {
         val routeStatusEnum = EnumFinder.findByName(RouteStatus::class.java, routeStatus)
-        val currentUsername = keycloakService.getUsernameByUserId(getCurrentUserId())
+        val currentUsername = keycloakService.getUsernameByUserId(securityUtils.getCurrentUserId())
         val routeItemPage = routeRepository.findWithFilter(
             PageRequest.of(0, 5), //TODO сделать keyset пагинацию
             username ?: "",
@@ -188,7 +189,7 @@ class RouteServiceImpl(
     private fun checkUserBelongToAdmin(username: String) {
         val userId = keycloakService.getUserIdByUsername(username)
             ?: throw ResourceNotFoundException(USER_NOT_FOUND_ERROR.format(username))
-        val adminId = getCurrentUserId()
+        val adminId = securityUtils.getCurrentUserId()
 
         require(coreClient.isUserBelongToAdmin(userId, adminId).isUserBelongAdmin) {
             USER_NOT_BELONG_ADMIN_ERROR.format(userId, adminId)

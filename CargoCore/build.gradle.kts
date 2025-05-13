@@ -30,6 +30,7 @@ val openApiStarterVersion = "2.6.0"
 val jacksonDatabindNullable = "0.2.6"
 val testContainersVersion = "1.20.1"
 val keyCloakAdminVersion = "25.0.6"
+val mockitoVersion = "5.2.1"
 
 // openApi
 val openApiSpecDir = "$rootDir/CargoCore/src/main/resources/openapi"
@@ -70,6 +71,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")

@@ -1,16 +1,15 @@
-package org.example.cargotransporationmonitoring
+package org.example.cargoroute
 
 import org.example.cargocommon.security.keycloak.KeycloakService
 import org.example.cargocommon.util.SecurityUtils
-import org.example.cargotransporationmonitoring.client.RouteClient
-import org.example.cargotransporationmonitoring.repository.UserAdminRepository
-import org.example.cargotransporationmonitoring.util.LinkTokenUtil
+import org.example.cargoroute.client.CoreClient
+import org.example.cargoroute.repository.CoordinateRepository
+import org.example.cargoroute.repository.RouteRepository
 import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.stereotype.Repository
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -19,11 +18,12 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
+
 @SpringBootTest
+@AutoConfigureMockMvc
 @Testcontainers
-class AbstractTest {
+@ActiveProfiles("test")
+abstract class AbstractTest {
 
     companion object {
         @Container
@@ -44,17 +44,18 @@ class AbstractTest {
 
     @AfterEach
     fun clear() {
-        userAdminRepository.deleteAll()
+        coordinateRepository.deleteAll()
+        routeRepository.deleteAll()
     }
 
     @Autowired
     protected lateinit var mockMvc: MockMvc
 
     @Autowired
-    protected lateinit var userAdminRepository: UserAdminRepository
+    protected lateinit var routeRepository: RouteRepository
 
     @Autowired
-    protected lateinit var linkTokenUtil: LinkTokenUtil
+    protected lateinit var coordinateRepository: CoordinateRepository
 
     @MockBean
     protected lateinit var keycloakService: KeycloakService
@@ -63,5 +64,5 @@ class AbstractTest {
     protected lateinit var securityUtils: SecurityUtils
 
     @MockBean
-    protected lateinit var routeClient: RouteClient
+    protected lateinit var coreClient: CoreClient
 }

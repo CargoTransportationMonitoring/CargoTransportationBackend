@@ -27,7 +27,7 @@ class SpringSecurityConfig {
     private lateinit var routeServiceUrl: String
 
     companion object {
-        private const val REGISTER_URL = "/api/v1/user/register"
+        private const val REGISTER_URL = "/api/v1/user"
         private const val ACCESS_DENIED_ERROR = "Access Denied"
     }
 

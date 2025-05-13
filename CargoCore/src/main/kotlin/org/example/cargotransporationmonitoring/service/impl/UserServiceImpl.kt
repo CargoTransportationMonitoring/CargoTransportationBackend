@@ -101,7 +101,11 @@ class UserServiceImpl(
     override fun getUsersByAdmin(adminId: String): List<GetUserResponse> {
         val userIds = userAdminRepository.findByAdminId(adminId).map { it.userId }
         return userIds.asSequence()
-            .map { GetUserResponse().id(it).username(keycloakService.getUsernameByUserId(it)) }
+            .map { GetUserResponse()
+                .id(it)
+                .username(keycloakService.getUsernameByUserId(it))
+                .adminUsername(keycloakService.getUsernameByUserId(adminId))
+            }
             .toList()
     }
 

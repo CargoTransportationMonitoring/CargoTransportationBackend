@@ -4,16 +4,7 @@ databaseChangeLog:
       author: ndivanov
       changes:
         - sqlFile:
-            path: db/changelog/V1__initial_schema.sql
-            encoding: UTF-8
-            splitStatements: true
-            stripComments: true
-  - changeSet:
-      id: 2
-      author: ndivanov
-      changes:
-        - sqlFile:
-            path: db/changelog/V2_user_attributes.sql
+            path: db/changelog/V1_user_attributes.sql
             encoding: UTF-8
             splitStatements: true
             stripComments: true
