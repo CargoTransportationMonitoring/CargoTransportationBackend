@@ -3,17 +3,8 @@ spring:
     name: CargoRoute
   liquibase:
     enabled: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8081/realms/cargotransportation-realm/protocol/openid-connect/certs
 server:
   port: 8092
-
-core:
-  service:
-    url: http://localhost:8083
 
 eureka:
   client:
